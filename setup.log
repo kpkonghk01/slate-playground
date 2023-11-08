@@ -1,0 +1,14 @@
+nvm use
+corepack enable
+yarn init -2
+# yarn set version stable
+
+# ts setup
+yarn add typescript --dev
+# yarn add -D ts-patch
+
+# slate setup
+yarn dlx storybook@latest init -p ts -t react_project -b vite
+# select "react_project", "Vite"
+# react_project vs react is peer deps vs deps, ref:
+# https://github.com/storybookjs/storybook/blob/master/lib/cli/src/project_types.ts#L167
