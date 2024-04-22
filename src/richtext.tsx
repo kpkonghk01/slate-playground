@@ -38,10 +38,106 @@ const RichTextExample = ({
     () => withTables(withHistory(withReact(createEditor()))),
     []
   );
-  const { normalizeNode } = editor;
+
+  return (
+    <Slate editor={editor} initialValue={initialValue} onChange={handleUpdate}>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      />
+      <Toolbar>
+        <MarkButton format="bold" icon="format_bold" />
+        <MarkButton format="italic" icon="format_italic" />
+        <MarkButton format="underline" icon="format_underlined" />
+        <MarkButton format="code" icon="code" />
+        <BlockButton format="heading-one" icon="looks_one" />
+        <BlockButton format="heading-two" icon="looks_two" />
+        <BlockButton format="block-quote" icon="format_quote" />
+        <BlockButton format="numbered-list" icon="format_list_numbered" />
+        <BlockButton format="bulleted-list" icon="format_list_bulleted" />
+        <BlockButton format="left" icon="format_align_left" />
+        <BlockButton format="center" icon="format_align_center" />
+        <BlockButton format="right" icon="format_align_right" />
+        <BlockButton format="justify" icon="format_align_justify" />
+        <TableButton icon="table_view" />
+      </Toolbar>
+      <Editable
+        style={{ padding: "8px 30px" }}
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
+        placeholder="Enter some rich text…"
+        spellCheck
+        autoFocus
+        onKeyDown={(event) => {
+          for (const [hotkey, mark] of Object.entries(HOTKEYS)) {
+            if (isHotkey(hotkey, event as any)) {
+              event.preventDefault();
+              toggleMark(editor, mark);
+            }
+          }
+        }}
+      />
+    </Slate>
+  );
+};
+
+const withTables = (editor: ReactEditor) => {
+  const { deleteBackward, deleteForward, normalizeNode } = editor;
+
+  editor.deleteBackward = (unit) => {
+    // copy from slate table example
+    const { selection } = editor;
+
+    if (selection && Range.isCollapsed(selection)) {
+      const [cell] = Editor.nodes(editor, {
+        match: (n) =>
+          !Editor.isEditor(n) &&
+          SlateElement.isElement(n) &&
+          // @ts-ignore
+          n.type === "table-cell",
+      });
+
+      if (cell) {
+        const [, cellPath] = cell;
+        const start = Editor.start(editor, cellPath);
+
+        if (Point.equals(selection.anchor, start)) {
+          return;
+        }
+      }
+    }
+
+    deleteBackward(unit);
+  };
+
+  editor.deleteForward = (unit) => {
+    // copy from slate table example
+    const { selection } = editor;
+
+    if (selection && Range.isCollapsed(selection)) {
+      const [cell] = Editor.nodes(editor, {
+        match: (n) =>
+          !Editor.isEditor(n) &&
+          SlateElement.isElement(n) &&
+          // @ts-ignore
+          n.type === "table-cell",
+      });
+
+      if (cell) {
+        const [, cellPath] = cell;
+        const end = Editor.end(editor, cellPath);
+
+        if (Point.equals(selection.anchor, end)) {
+          return;
+        }
+      }
+    }
+
+    deleteForward(unit);
+  };
 
   editor.normalizeNode = (entry) => {
-    // ref: https://github.dev/udecode/plate/blob/main/packages/table/src/withNormalizeTable.ts
+    // edit from ref: https://github.dev/udecode/plate/blob/main/packages/table/src/withNormalizeTable.ts
     const [node, path] = entry;
 
     // @ts-ignore
@@ -123,113 +219,8 @@ const RichTextExample = ({
         return;
       }
 
-      // @ts-ignore
-      // const { children } = node;
-
-      // if (Text.isText(children[0])) {
-      //   // TODO: wrap text in a paragraph
-      //   console.log("paragraph", path);
-
-      //   return;
-      // }
-
       normalizeNode(entry);
     }
-  };
-
-  return (
-    <Slate editor={editor} initialValue={initialValue} onChange={handleUpdate}>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      />
-      <Toolbar>
-        <MarkButton format="bold" icon="format_bold" />
-        <MarkButton format="italic" icon="format_italic" />
-        <MarkButton format="underline" icon="format_underlined" />
-        <MarkButton format="code" icon="code" />
-        <BlockButton format="heading-one" icon="looks_one" />
-        <BlockButton format="heading-two" icon="looks_two" />
-        <BlockButton format="block-quote" icon="format_quote" />
-        <BlockButton format="numbered-list" icon="format_list_numbered" />
-        <BlockButton format="bulleted-list" icon="format_list_bulleted" />
-        <BlockButton format="left" icon="format_align_left" />
-        <BlockButton format="center" icon="format_align_center" />
-        <BlockButton format="right" icon="format_align_right" />
-        <BlockButton format="justify" icon="format_align_justify" />
-        <TableButton icon="table_view" />
-      </Toolbar>
-      <Editable
-        style={{ padding: "8px 30px" }}
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        placeholder="Enter some rich text…"
-        spellCheck
-        autoFocus
-        onKeyDown={(event) => {
-          for (const [hotkey, mark] of Object.entries(HOTKEYS)) {
-            if (isHotkey(hotkey, event as any)) {
-              event.preventDefault();
-              toggleMark(editor, mark);
-            }
-          }
-        }}
-      />
-    </Slate>
-  );
-};
-
-const withTables = (editor: ReactEditor) => {
-  const { deleteBackward, deleteForward, insertBreak } = editor;
-
-  editor.deleteBackward = (unit) => {
-    const { selection } = editor;
-
-    if (selection && Range.isCollapsed(selection)) {
-      const [cell] = Editor.nodes(editor, {
-        match: (n) =>
-          !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          // @ts-ignore
-          n.type === "table-cell",
-      });
-
-      if (cell) {
-        const [, cellPath] = cell;
-        const start = Editor.start(editor, cellPath);
-
-        if (Point.equals(selection.anchor, start)) {
-          return;
-        }
-      }
-    }
-
-    deleteBackward(unit);
-  };
-
-  editor.deleteForward = (unit) => {
-    const { selection } = editor;
-
-    if (selection && Range.isCollapsed(selection)) {
-      const [cell] = Editor.nodes(editor, {
-        match: (n) =>
-          !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          // @ts-ignore
-          n.type === "table-cell",
-      });
-
-      if (cell) {
-        const [, cellPath] = cell;
-        const end = Editor.end(editor, cellPath);
-
-        if (Point.equals(selection.anchor, end)) {
-          return;
-        }
-      }
-    }
-
-    deleteForward(unit);
   };
 
   return editor;
