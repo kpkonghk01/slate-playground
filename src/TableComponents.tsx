@@ -77,9 +77,13 @@ const useCellSelection = (rowId: number, colIdx: number) => {
   const [[startRow, startCol], [endRow, endCol]] = selectedRange;
 
   const rowInRange = rowId >= startRow && rowId <= endRow;
-  const colInRange = colIdx >= startCol && colIdx <= endCol;
 
-  return rowInRange && colInRange;
+  // left top to right bottom case
+  const colInRange = colIdx >= startCol && colIdx <= endCol;
+  // right top to left bottom case
+  const colInRangeReverse = colIdx <= startCol && colIdx >= endCol;
+
+  return rowInRange && (colInRange || colInRangeReverse);
 };
 
 // @ts-ignore
