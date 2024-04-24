@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useSelected, useSlate } from "slate-react";
 import { isBlockActive } from "./common-utils";
 import { Button, Icon } from "./components";
-import { toggleTable } from "./table-utils";
+import { getSelectedTablePath, toggleTable } from "./table-utils";
 import { Editor, Node, Path, Range } from "slate";
 
 type TableSelection = [[number, number], [number, number]];
@@ -32,31 +32,7 @@ const useTableSelection = (element: any) => {
     // const collapsed = Range.isCollapsed(selection);
     // console.log("collapsed:", collapsed);
 
-    // copy from https://docs.slatejs.org/concepts/03-locations#path
-    const range = Editor.unhangRange(editor, selection, { voids: true });
-
-    let [common, path] = Node.common(
-      editor,
-      range.anchor.path,
-      range.focus.path
-    );
-
-    const isEditor = Editor.isEditor(common);
-
-    if (isEditor) {
-      // when the selection crosses root elements
-      setSelectedRange(null);
-      return;
-    }
-
-    let tableRootPath: Path = [];
-    // @ts-ignore
-    if (common?.type === "table") {
-      tableRootPath = path;
-      // @ts-ignore
-    } else if (common?.type === "table-row") {
-      tableRootPath = path.slice(0, -1);
-    }
+    const tableRootPath = getSelectedTablePath(editor);
 
     // Assumption: no nested table
     if (tableRootPath.length !== 1) {
@@ -89,7 +65,9 @@ const useTableSelection = (element: any) => {
 export const TableElement = ({ style = {}, attributes, children, element }) => {
   const selectedRange = useTableSelection(element);
 
-  console.log("selectedRange:", selectedRange);
+  useEffect(() => {
+    console.log("selectedRange:", JSON.stringify(selectedRange, null, 2));
+  }, [selectedRange]);
 
   // console.log(
   //   "element:",
@@ -130,7 +108,7 @@ export const TableRowElement = ({
     <tr
       style={style}
       {...attributes}
-      roleSpan={element.rowSpan ?? 1}
+      rowSpan={element.rowSpan ?? 1}
       colSpan={element.colSpan ?? 1}
     >
       {children}

@@ -1,11 +1,12 @@
-import { Editor, Element, Point, Range, Transforms } from "slate";
+import { Editor, Element, Node, Path, Point, Range, Transforms } from "slate";
 import { isBlockActive } from "./common-utils";
 import { ReactEditor } from "slate-react";
 
 export const withTables = (editor: ReactEditor) => {
-  const { deleteBackward, deleteForward, normalizeNode } = editor;
+  const { deleteBackward, deleteForward, normalizeNode, insertText } = editor;
 
   editor.deleteBackward = (unit) => {
+    console.log("deleteBackward");
     // copy from slate table example
     const { selection } = editor;
 
@@ -32,6 +33,7 @@ export const withTables = (editor: ReactEditor) => {
   };
 
   editor.deleteForward = (unit) => {
+    console.log("deleteForward");
     // copy from slate table example
     const { selection } = editor;
 
@@ -144,8 +146,100 @@ export const withTables = (editor: ReactEditor) => {
     }
   };
 
+  editor.insertText = (text) => {
+    const { selection } = editor;
+
+    if (!selection) {
+      // should not insert anything when there is no selection
+      return;
+    }
+
+    if (Range.isCollapsed(selection)) {
+      // not range selection
+      // inset text to the focus
+      insertText(text);
+
+      return;
+    }
+
+    const selectedTablePath = getSelectedTablePath(editor);
+
+    if (selectedTablePath.length !== 0) {
+      // FIXME: the focus is not correct when the selection is backward, but Range.isBackward is always false, the selection looks always forward
+      // plate.js has the same issue
+
+      // selection is inside a table and cross cells
+      // insert text to the focused cell
+      insertText(text, { at: selection.focus });
+
+      // reset the selection to the focus
+      Transforms.select(editor, {
+        anchor: selection.focus,
+        focus: selection.focus,
+      });
+
+      return;
+    }
+
+    const cellsGenerator = Editor.nodes(editor, {
+      at: selection,
+      match: (n) => {
+        // @ts-ignore
+        return n.type === "table-cell";
+      },
+    });
+
+    if (!cellsGenerator.next().done) {
+      // cross table selection with non table elements
+      // TODO: behavior TBD
+      console.log(
+        "unhandled case: cross table selection with non table elements"
+      );
+
+      return;
+    }
+
+    // no cell in the selection
+    insertText(text);
+
+    return;
+  };
+
+  // FIXME: cross table setNodes does not work
+
   return editor;
 };
+
+export function getSelectedTablePath(editor: Editor) {
+  const selection = editor.selection;
+
+  if (!selection) {
+    return [];
+  }
+
+  // copy from https://docs.slatejs.org/concepts/03-locations#path
+  const range = Editor.unhangRange(editor, selection, { voids: true });
+
+  let [common, path] = Node.common(editor, range.anchor.path, range.focus.path);
+
+  const isEditor = Editor.isEditor(common);
+
+  if (isEditor) {
+    // when the selection crosses root elements
+    return [];
+  }
+
+  let tableRootPath: Path = [];
+  // @ts-ignore
+  if (common?.type === "table") {
+    tableRootPath = path;
+    // @ts-ignore
+  } else if (common?.type === "table-row") {
+    tableRootPath = path.slice(0, -1);
+  }
+
+  return tableRootPath;
+}
 
 export const toggleTable = (editor: Editor) => {
   const isActive = isBlockActive(editor, "table");
