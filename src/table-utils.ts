@@ -252,11 +252,13 @@ export const toggleTable = (editor: Editor) => {
   Transforms.insertNodes(editor, table);
 };
 
-export const initCell = () => {
+export const initCell = (rowIdx: number, colIdx: number) => {
   const col = {
     type: "table-cell",
     rowSpan: 1,
     colSpan: 1,
+    rowIdx,
+    colIdx,
     children: [
       {
         // @ts-ignore
@@ -269,15 +271,16 @@ export const initCell = () => {
   return col;
 };
 
-export const initRow = (cols: number) => {
+export const initRow = (cols: number, rowIdx: number) => {
   const row = {
     type: "table-row",
+    rowIdx,
     children: [],
   };
 
-  for (let j = 0; j < cols; j++) {
+  for (let colIdx = 0; colIdx < cols; colIdx++) {
     // @ts-ignore
-    row.children.push(initCell());
+    row.children.push(initCell(rowIdx, colIdx));
   }
 
   return row;
@@ -297,9 +300,9 @@ export const initTable = ({
     children: [],
   };
 
-  for (let i = 0; i < rows; i++) {
+  for (let rowIdx = 0; rowIdx < rows; rowIdx++) {
     // @ts-ignore
-    table.children.push(initRow(cols));
+    table.children.push(initRow(cols, rowIdx));
   }
 
   return table;

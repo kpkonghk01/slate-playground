@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import { useSelected, useSlate } from "slate-react";
 import { isBlockActive } from "./common-utils";
 import { Button, Icon } from "./components";
 import { getSelectedTablePath, toggleTable } from "./table-utils";
-import { Editor, Node, Path, Range } from "slate";
+import { Path, Range } from "slate";
+
+import "./table.css";
 
 type TableSelection = [[number, number], [number, number]];
 
@@ -61,6 +63,25 @@ const useTableSelection = (element: any) => {
   return selectedRange;
 };
 
+const TableContext = createContext({
+  selectedRange: null as TableSelection | null,
+});
+
+const useCellSelection = (rowId: number, colIdx: number) => {
+  const { selectedRange } = useContext(TableContext);
+
+  if (!selectedRange) {
+    return false;
+  }
+
+  const [[startRow, startCol], [endRow, endCol]] = selectedRange;
+
+  const rowInRange = rowId >= startRow && rowId <= endRow;
+  const colInRange = colIdx >= startCol && colIdx <= endCol;
+
+  return rowInRange && colInRange;
+};
+
 // @ts-ignore
 export const TableElement = ({ style = {}, attributes, children, element }) => {
   const selectedRange = useTableSelection(element);
@@ -81,17 +102,20 @@ export const TableElement = ({ style = {}, attributes, children, element }) => {
   // );
 
   return (
-    <table
-      style={{
-        ...style,
-        width: "100%",
-        borderCollapse: "collapse",
-        tableLayout: "fixed",
-      }}
-      {...attributes}
-    >
-      <tbody>{children}</tbody>
-    </table>
+    <TableContext.Provider value={{ selectedRange }}>
+      <table
+        style={{
+          ...style,
+          width: "100%",
+          borderCollapse: "collapse",
+          tableLayout: "fixed",
+        }}
+        className={selectedRange ? "table-in-selection" : ""}
+        {...attributes}
+      >
+        <tbody>{children}</tbody>
+      </table>
+    </TableContext.Provider>
   );
 };
 
@@ -125,6 +149,9 @@ export const TableCellElement = ({
   // @ts-ignore
   element,
 }) => {
+  // @ts-ignore
+  const isCellSelected = useCellSelection(element.rowIdx, element.colIdx);
+
   return (
     <td
       style={{
@@ -132,6 +159,7 @@ export const TableCellElement = ({
         border: "1px solid",
         padding: "4px 8px",
       }}
+      className={isCellSelected ? "cell-selected" : isCellSelected}
       {...attributes}
     >
       {children}

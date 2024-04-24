@@ -1,0 +1,8 @@
+.table-in-selection tr *::selection,
+.table-in-selection td *::selection {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.table-in-selection .cell-selected {
+  background-color: lightgrey;
+}
