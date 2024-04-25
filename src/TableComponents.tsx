@@ -14,12 +14,13 @@ import {
 import { Path, Range } from "slate";
 
 import "./table.css";
-import { TableSelection } from "./table-types";
+import { CellsRange } from "./table-types";
 
 // only use this hook in table element, since `isSelected` is false when the selection does not include the current cell
 const useTableSelection = (element: any) => {
-  const [selectedRange, setSelectedRange] =
-    React.useState<TableSelection | null>(null);
+  const [selectedRange, setSelectedRange] = React.useState<CellsRange | null>(
+    null
+  );
 
   const editor = useSlate();
 
@@ -34,7 +35,6 @@ const useTableSelection = (element: any) => {
 
   useEffect(() => {
     // FIXME: if the cells are empty, the selection crosses two cells in a row will not be detected
-
     if (!isSelected || !selection) {
       setSelectedRange(null);
       return;
@@ -54,19 +54,19 @@ const useTableSelection = (element: any) => {
     // edges must be forward direction of selection
     const [startPoint, endPoint] = Range.edges(selection); // equals to `Editor.edges(editor, selection)`
 
-    const currentSelectedRange: TableSelection = [
+    const currentSelectedRange: CellsRange = [
       Path.relative(startPoint.path, tableRootPath).slice(
         0,
         2
-      ) as TableSelection[number],
+      ) as CellsRange[number],
       Path.relative(endPoint.path, tableRootPath).slice(
         0,
         2
-      ) as TableSelection[number],
+      ) as CellsRange[number],
     ];
 
     // normalize selection range, ensure the selection is from the top-left corner to the bottom-right corner
-    const normalizedSelectedRange: TableSelection = [
+    const normalizedSelectedRange: CellsRange = [
       [
         Math.min(currentSelectedRange[0][0], currentSelectedRange[1][0]),
         Math.min(currentSelectedRange[0][1], currentSelectedRange[1][1]),
@@ -86,10 +86,10 @@ const useTableSelection = (element: any) => {
 };
 
 const TableContext = createContext({
-  selectedRange: null as TableSelection | null,
+  selectedRange: null as CellsRange | null,
 });
 
-const useCellSelection = (rowId: number, colIdx: number) => {
+const useCellSelection = (range: CellsRange) => {
   const { selectedRange } = useContext(TableContext);
 
   if (!selectedRange) {
@@ -98,10 +98,27 @@ const useCellSelection = (rowId: number, colIdx: number) => {
 
   const [[startRow, startCol], [endRow, endCol]] = selectedRange;
 
-  const rowInRange = rowId >= startRow && rowId <= endRow;
-  const colInRange = colIdx >= startCol && colIdx <= endCol;
+  if (
+    // bottom-right corner of range is inside the selected range
+    range[0][0] >= startRow &&
+    range[0][1] >= startCol &&
+    range[0][0] <= endRow &&
+    range[0][1] <= endCol
+  ) {
+    return true;
+  }
 
-  return rowInRange && colInRange;
+  if (
+    // top-left corner of range is inside the selected range
+    range[1][0] >= startRow &&
+    range[1][1] >= startCol &&
+    range[1][0] <= endRow &&
+    range[1][1] <= endCol
+  ) {
+    return true;
+  }
+
+  return false;
 };
 
 // @ts-ignore
@@ -251,7 +268,15 @@ export const TableCellElement = ({
     number
   ];
 
-  const isCellSelected = useCellSelection(rowIdx, colIdx);
+  const { rowSpan = 1, colSpan = 1 } = element as {
+    rowSpan: number;
+    colSpan: number;
+  };
+
+  const isCellSelected = useCellSelection([
+    [rowIdx, colIdx],
+    [rowIdx + rowSpan - 1, colIdx + colSpan - 1],
+  ]);
 
   if (element.colSpan === 0 || element.rowSpan === 0) {
     return null;
@@ -265,8 +290,8 @@ export const TableCellElement = ({
         padding: "4px 8px",
       }}
       className={isCellSelected ? "cell-selected" : ""}
-      rowSpan={element.rowSpan ?? 1}
-      colSpan={element.colSpan ?? 1}
+      rowSpan={rowSpan}
+      colSpan={colSpan}
       {...attributes}
     >
       {children}

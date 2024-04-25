@@ -1,7 +1,7 @@
 import { Editor, Element, Node, Path, Point, Range, Transforms } from "slate";
 import { isBlockActive } from "./common-utils";
 import { ReactEditor } from "slate-react";
-import { TableSelection } from "./table-types";
+import { CellsRange } from "./table-types";
 
 const withDeleteTableBackward = (editor: ReactEditor) => {
   const { deleteBackward } = editor;
@@ -260,16 +260,12 @@ export function getSelectedTablePath(editor: Editor): Path | null {
     return null;
   }
 
-  let tableRootPath: Path | null = null;
   // @ts-ignore
-  if (common?.type === "table") {
-    tableRootPath = path;
-    // @ts-ignore
-  } else if (common?.type === "table-row") {
-    tableRootPath = path.slice(0, -1);
+  if (common?.type !== "table" && common?.type !== "table-row") {
+    return null;
   }
 
-  return tableRootPath;
+  return [path[0]!];
 }
 
 export const insertTable = (editor: Editor) => {
@@ -405,7 +401,7 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
 export const mergeCells = (
   editor: Editor,
   tableIdx: number,
-  selectedRange: TableSelection | null
+  selectedRange: CellsRange | null
 ) => {
   if (!tableIdx || !selectedRange) {
     // no selection

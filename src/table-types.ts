@@ -1,1 +1,1 @@
-export type TableSelection = [[number, number], [number, number]];
+export type CellsRange = [[number, number], [number, number]];
