@@ -1,7 +1,16 @@
-import { Editor, Element, Node, Path, Point, Range, Transforms } from "slate";
+import {
+  Descendant,
+  Editor,
+  Element,
+  Node,
+  Path,
+  Point,
+  Range,
+  Transforms,
+} from "slate";
 import { isBlockActive } from "./common-utils";
 import { ReactEditor } from "slate-react";
-import { CellsRange } from "./table-types";
+import { CellElement, CellsRange, RowElement } from "./table-types";
 
 const withDeleteTableBackward = (editor: ReactEditor) => {
   const { deleteBackward } = editor;
@@ -296,7 +305,7 @@ const getTableInfo = (editor: Editor, tableIdx: number) => {
   // @ts-ignore
   const numberOfCols = tableNode.children[0].children.length;
 
-  return { numberOfRows, numberOfCols };
+  return { tableNode, numberOfRows, numberOfCols };
 };
 
 // target should in the form of [tableIdxAtRoot, rowIdx]
@@ -319,7 +328,60 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
     return;
   }
 
+  const rowSpannedAt = new Set<number>();
+
+  for (let colIdx = 0; colIdx < tableInfo.numberOfCols; colIdx++) {
+    // @ts-ignore
+    const checkCell = tableInfo.tableNode.children[insertAt].children[colIdx];
+
+    if (checkCell.colSpan === 0) {
+      rowSpannedAt.add(colIdx);
+    } else {
+      // skip colSpanned cells
+      colIdx += checkCell.colSpan - 1;
+    }
+  }
+
   const newRow = initRow(tableInfo.numberOfCols);
+
+  for (let colIdx = 0; colIdx < tableInfo.numberOfCols; colIdx++) {
+    // existence is ensured by initRow
+    const newCell = newRow.children[colIdx] as CellElement;
+
+    if (rowSpannedAt.has(colIdx)) {
+      newCell.rowSpan = 0;
+      newCell.colSpan = 0;
+
+      // extend the rowSpanned cell
+      let rowSpannedFrom = insertAt - 1;
+
+      while (rowSpannedFrom >= 0) {
+        const rowSpanCell =
+          // @ts-ignore
+          tableInfo.tableNode.children[rowSpannedFrom].children[colIdx];
+
+        if (rowSpanCell.rowSpan > 0) {
+          if (rowSpannedFrom + rowSpanCell.rowSpan - 1 >= insertAt) {
+            // extend the rowSpanned cell
+            Transforms.setNodes(
+              editor,
+              {
+                // @ts-ignore
+                rowSpan: rowSpanCell.rowSpan + 1,
+              },
+              {
+                at: [tableIdx, rowSpannedFrom, colIdx],
+              }
+            );
+          }
+
+          break;
+        }
+
+        rowSpannedFrom--;
+      }
+    }
+  }
 
   Transforms.insertNodes(editor, newRow, { at: target });
 };
@@ -366,8 +428,57 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
     return;
   }
 
+  const colSpannedAt = new Set<number>();
+
+  for (let rowIdx = 0; rowIdx < tableInfo.numberOfRows; rowIdx++) {
+    // @ts-ignore
+    const checkCell = tableInfo.tableNode.children[rowIdx].children[insertAt];
+
+    if (checkCell.rowSpan === 0) {
+      colSpannedAt.add(rowIdx);
+    } else {
+      // skip rowSpanned cells
+      rowIdx += checkCell.rowSpan - 1;
+    }
+  }
+
   for (let rowIdx = 0; rowIdx < tableInfo.numberOfRows; rowIdx++) {
     const newCell = initCell();
+
+    if (colSpannedAt.has(rowIdx)) {
+      newCell.rowSpan = 0;
+      newCell.colSpan = 0;
+
+      // extend the colSpanned cell
+      let colSpannedFrom = insertAt - 1;
+
+      while (colSpannedFrom >= 0) {
+        const colSpanCell =
+          // @ts-ignore
+          tableInfo.tableNode.children[rowIdx].children[colSpannedFrom];
+
+        if (colSpanCell.colSpan > 0) {
+          if (colSpannedFrom + colSpanCell.colSpan - 1 >= insertAt) {
+            // extend the colSpanned cell
+            Transforms.setNodes(
+              editor,
+              {
+                // @ts-ignore
+                colSpan: colSpanCell.colSpan + 1,
+              },
+              {
+                at: [tableIdx, rowIdx, colSpannedFrom],
+              }
+            );
+          }
+
+          break;
+        }
+
+        colSpannedFrom--;
+      }
+    }
+
     Transforms.insertNodes(editor, newCell, {
       at: [tableIdx, rowIdx, insertAt],
     });
@@ -403,7 +514,7 @@ export const mergeCells = (
   tableIdx: number,
   selectedRange: CellsRange | null
 ) => {
-  if (!tableIdx || !selectedRange) {
+  if (!Number.isInteger(tableIdx) || !selectedRange) {
     // no selection
     return;
   }
@@ -459,9 +570,9 @@ export const mergeCells = (
   }
 };
 
-export const initCell = () => {
-  const col = {
-    type: "table-cell",
+export const initCell = (): CellElement => {
+  const cell = {
+    type: "table-cell" as const,
     rowSpan: 1,
     colSpan: 1,
     children: [
@@ -473,12 +584,12 @@ export const initCell = () => {
     ],
   };
 
-  return col;
+  return cell;
 };
 
-export const initRow = (cols: number) => {
+export const initRow = (cols: number): RowElement => {
   const row = {
-    type: "table-row",
+    type: "table-row" as const,
     children: [],
   };
 

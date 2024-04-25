@@ -237,12 +237,7 @@ export const TableRowElement = ({
   element,
 }) => {
   return (
-    <tr
-      style={style}
-      {...attributes}
-      rowSpan={element.rowSpan ?? 1}
-      colSpan={element.colSpan ?? 1}
-    >
+    <tr style={style} {...attributes}>
       {children}
     </tr>
   );

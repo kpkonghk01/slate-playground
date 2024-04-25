@@ -275,48 +275,215 @@ const MarkButton = ({ format, icon }) => {
   );
 };
 
+// const initialValue: Descendant[] = [
+//   {
+//     // @ts-ignore
+//     type: "paragraph",
+//     children: [
+//       { text: "" },
+//       // { text: "This is editable " },
+//       // // @ts-ignore
+//       // { text: "rich", bold: true },
+//       // { text: " text, " },
+//       // // @ts-ignore
+//       // { text: "much", italic: true },
+//       // { text: " better than a " },
+//       // // @ts-ignore
+//       // { text: "<textarea>", code: true },
+//       // { text: "!" },
+//     ],
+//   },
+//   // {
+//   //   type: "paragraph",
+//   //   children: [
+//   //     {
+//   //       text: "Since it's rich text, you can do things like turn a selection of text ",
+//   //     },
+//   //     // @ts-ignore
+//   //     { text: "bold", bold: true },
+//   //     {
+//   //       text: ", or add a semantically rendered block quote in the middle of the page, like this:",
+//   //     },
+//   //   ],
+//   // },
+//   // {
+//   //   // @ts-ignore
+//   //   type: "block-quote",
+//   //   children: [{ text: "A wise quote." }],
+//   // },
+//   // {
+//   //   // @ts-ignore
+//   //   type: "paragraph",
+//   //   align: "center",
+//   //   children: [{ text: "Try it out for yourself!" }],
+//   // },
+// ];
+
 const initialValue: Descendant[] = [
   {
-    // @ts-ignore
-    type: "paragraph",
+    type: "table",
     children: [
-      { text: "" },
-      // { text: "This is editable " },
-      // // @ts-ignore
-      // { text: "rich", bold: true },
-      // { text: " text, " },
-      // // @ts-ignore
-      // { text: "much", italic: true },
-      // { text: " better than a " },
-      // // @ts-ignore
-      // { text: "<textarea>", code: true },
-      // { text: "!" },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "1",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "2",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "3",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "5",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "6",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "7",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "8",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "9",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
     ],
   },
-  // {
-  //   type: "paragraph",
-  //   children: [
-  //     {
-  //       text: "Since it's rich text, you can do things like turn a selection of text ",
-  //     },
-  //     // @ts-ignore
-  //     { text: "bold", bold: true },
-  //     {
-  //       text: ", or add a semantically rendered block quote in the middle of the page, like this:",
-  //     },
-  //   ],
-  // },
-  // {
-  //   // @ts-ignore
-  //   type: "block-quote",
-  //   children: [{ text: "A wise quote." }],
-  // },
-  // {
-  //   // @ts-ignore
-  //   type: "paragraph",
-  //   align: "center",
-  //   children: [{ text: "Try it out for yourself!" }],
-  // },
 ];
 
 export default RichTextExample;
