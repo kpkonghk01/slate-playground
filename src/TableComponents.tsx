@@ -33,6 +33,8 @@ const useTableSelection = (element: any) => {
   }
 
   useEffect(() => {
+    // FIXME: if the cells are empty, the selection crosses two cells in a row will not be detected
+
     if (!isSelected || !selection) {
       setSelectedRange(null);
       return;
@@ -63,7 +65,21 @@ const useTableSelection = (element: any) => {
       ) as TableSelection[number],
     ];
 
-    setSelectedRange(currentSelectedRange);
+    // normalize selection range, ensure the selection is from the top-left corner to the bottom-right corner
+    const normalizedSelectedRange: TableSelection = [
+      [
+        Math.min(currentSelectedRange[0][0], currentSelectedRange[1][0]),
+        Math.min(currentSelectedRange[0][1], currentSelectedRange[1][1]),
+      ],
+      [
+        Math.max(currentSelectedRange[0][0], currentSelectedRange[1][0]),
+        Math.max(currentSelectedRange[0][1], currentSelectedRange[1][1]),
+      ],
+    ];
+
+    // TODO: scan the border, see if any cell is merged and expand the range if necessary
+
+    setSelectedRange(normalizedSelectedRange);
   }, [editor, isSelected, selection]);
 
   return selectedRange;
@@ -83,13 +99,9 @@ const useCellSelection = (rowId: number, colIdx: number) => {
   const [[startRow, startCol], [endRow, endCol]] = selectedRange;
 
   const rowInRange = rowId >= startRow && rowId <= endRow;
-
-  // left top to right bottom case
   const colInRange = colIdx >= startCol && colIdx <= endCol;
-  // right top to left bottom case
-  const colInRangeReverse = colIdx <= startCol && colIdx >= endCol;
 
-  return rowInRange && (colInRange || colInRangeReverse);
+  return rowInRange && colInRange;
 };
 
 // @ts-ignore
