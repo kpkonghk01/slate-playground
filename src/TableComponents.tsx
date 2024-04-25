@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect } from "react";
-import { useSelected, useSlate } from "slate-react";
+import { ReactEditor, useSelected, useSlate } from "slate-react";
 import { isBlockActive } from "./common-utils";
 import { Button, Icon } from "./components";
 import { getSelectedTablePath, toggleTable } from "./table-utils";
@@ -37,7 +37,7 @@ const useTableSelection = (element: any) => {
     const tableRootPath = getSelectedTablePath(editor);
 
     // Assumption: no nested table
-    if (tableRootPath.length !== 1) {
+    if (tableRootPath === null) {
       // when the selection is inside a table cell
       setSelectedRange(null);
       return;
@@ -89,10 +89,6 @@ const useCellSelection = (rowId: number, colIdx: number) => {
 // @ts-ignore
 export const TableElement = ({ style = {}, attributes, children, element }) => {
   const selectedRange = useTableSelection(element);
-
-  useEffect(() => {
-    console.log("selectedRange:", JSON.stringify(selectedRange, null, 2));
-  }, [selectedRange]);
 
   // console.log(
   //   "element:",
@@ -154,7 +150,17 @@ export const TableCellElement = ({
   element,
 }) => {
   // @ts-ignore
-  const isCellSelected = useCellSelection(element.rowIdx, element.colIdx);
+
+  const editor = useSlate() as ReactEditor;
+
+  // Assumption: no nested table, so the path is always [tableIdxAtRoot, rowIdx, colIdx]
+  const [, rowIdx, colIdx] = ReactEditor.findPath(editor, element) as [
+    number,
+    number,
+    number
+  ];
+
+  const isCellSelected = useCellSelection(rowIdx, colIdx);
 
   return (
     <td
@@ -163,7 +169,7 @@ export const TableCellElement = ({
         border: "1px solid",
         padding: "4px 8px",
       }}
-      className={isCellSelected ? "cell-selected" : isCellSelected}
+      className={isCellSelected ? "cell-selected" : ""}
       {...attributes}
     >
       {children}

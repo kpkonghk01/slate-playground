@@ -2,8 +2,8 @@ import { Editor, Element, Node, Path, Point, Range, Transforms } from "slate";
 import { isBlockActive } from "./common-utils";
 import { ReactEditor } from "slate-react";
 
-export const withTables = (editor: ReactEditor) => {
-  const { deleteBackward, deleteForward, normalizeNode, insertText } = editor;
+const withDeleteTableBackward = (editor: ReactEditor) => {
+  const { deleteBackward } = editor;
 
   editor.deleteBackward = (unit) => {
     console.log("deleteBackward");
@@ -32,6 +32,12 @@ export const withTables = (editor: ReactEditor) => {
     deleteBackward(unit);
   };
 
+  return editor;
+};
+
+const withDeleteTableForward = (editor: ReactEditor) => {
+  const { deleteForward } = editor;
+
   editor.deleteForward = (unit) => {
     console.log("deleteForward");
     // copy from slate table example
@@ -58,6 +64,12 @@ export const withTables = (editor: ReactEditor) => {
 
     deleteForward(unit);
   };
+
+  return editor;
+};
+
+const withNormalizeTable = (editor: ReactEditor) => {
+  const { normalizeNode } = editor;
 
   editor.normalizeNode = (entry) => {
     // edit from ref: https://github.dev/udecode/plate/blob/main/packages/table/src/withNormalizeTable.ts
@@ -146,6 +158,12 @@ export const withTables = (editor: ReactEditor) => {
     }
   };
 
+  return editor;
+};
+
+const withInsertTextInTable = (editor: ReactEditor) => {
+  const { insertText } = editor;
+
   editor.insertText = (text) => {
     const { selection } = editor;
 
@@ -164,7 +182,7 @@ export const withTables = (editor: ReactEditor) => {
 
     const selectedTablePath = getSelectedTablePath(editor);
 
-    if (selectedTablePath.length !== 0) {
+    if (selectedTablePath === null) {
       // FIXME: the focus is not correct when the selection is backward, but Range.isBackward is always false, the selection looks always forward
       // plate.js has the same issue
 
@@ -205,16 +223,28 @@ export const withTables = (editor: ReactEditor) => {
     return;
   };
 
+  return editor;
+};
+
+export const withTables = (editor: ReactEditor) => {
+  // using their side effect to modify the editor, so don't need nested calls of withXXX
+  [
+    withDeleteTableBackward,
+    withDeleteTableForward,
+    withNormalizeTable,
+    withInsertTextInTable,
+  ].forEach((fn) => fn(editor));
+
   // FIXME: cross table setNodes does not work
 
   return editor;
 };
 
-export function getSelectedTablePath(editor: Editor) {
+export function getSelectedTablePath(editor: Editor): Path | null {
   const selection = editor.selection;
 
   if (!selection) {
-    return [];
+    return null;
   }
 
   // copy from https://docs.slatejs.org/concepts/03-locations#path
@@ -226,10 +256,10 @@ export function getSelectedTablePath(editor: Editor) {
 
   if (isEditor) {
     // when the selection crosses root elements
-    return [];
+    return null;
   }
 
-  let tableRootPath: Path = [];
+  let tableRootPath: Path | null = null;
   // @ts-ignore
   if (common?.type === "table") {
     tableRootPath = path;
@@ -252,13 +282,11 @@ export const toggleTable = (editor: Editor) => {
   Transforms.insertNodes(editor, table);
 };
 
-export const initCell = (rowIdx: number, colIdx: number) => {
+export const initCell = () => {
   const col = {
     type: "table-cell",
     rowSpan: 1,
     colSpan: 1,
-    rowIdx,
-    colIdx,
     children: [
       {
         // @ts-ignore
@@ -271,16 +299,15 @@ export const initCell = (rowIdx: number, colIdx: number) => {
   return col;
 };
 
-export const initRow = (cols: number, rowIdx: number) => {
+export const initRow = (cols: number) => {
   const row = {
     type: "table-row",
-    rowIdx,
     children: [],
   };
 
   for (let colIdx = 0; colIdx < cols; colIdx++) {
     // @ts-ignore
-    row.children.push(initCell(rowIdx, colIdx));
+    row.children.push(initCell());
   }
 
   return row;
@@ -302,7 +329,7 @@ export const initTable = ({
 
   for (let rowIdx = 0; rowIdx < rows; rowIdx++) {
     // @ts-ignore
-    table.children.push(initRow(cols, rowIdx));
+    table.children.push(initRow(cols));
   }
 
   return table;
