@@ -9,12 +9,12 @@ import {
   insertCol,
   insertRow,
   insertTable,
+  mergeCells,
 } from "./table-utils";
 import { Path, Range } from "slate";
 
 import "./table.css";
-
-type TableSelection = [[number, number], [number, number]];
+import { TableSelection } from "./table-types";
 
 // only use this hook in table element, since `isSelected` is false when the selection does not include the current cell
 const useTableSelection = (element: any) => {
@@ -187,6 +187,24 @@ export const TableElement = ({ style = {}, attributes, children, element }) => {
         >
           Delete col
         </button>
+        <button
+          onClick={() => {
+            // ensured by disabled prop
+            const [tableIdx] = ReactEditor.findPath(editor, element) as [
+              number
+            ];
+
+            mergeCells(
+              editor,
+              tableIdx,
+              // ensured by disabled prop
+              selectedRange!
+            );
+          }}
+          disabled={!isSelected || !selectedRange}
+        >
+          Merge cells
+        </button>
       </div>
     </TableContext.Provider>
   );
@@ -235,6 +253,10 @@ export const TableCellElement = ({
 
   const isCellSelected = useCellSelection(rowIdx, colIdx);
 
+  if (element.colSpan === 0 || element.rowSpan === 0) {
+    return null;
+  }
+
   return (
     <td
       style={{
@@ -243,6 +265,8 @@ export const TableCellElement = ({
         padding: "4px 8px",
       }}
       className={isCellSelected ? "cell-selected" : ""}
+      rowSpan={element.rowSpan ?? 1}
+      colSpan={element.colSpan ?? 1}
       {...attributes}
     >
       {children}
