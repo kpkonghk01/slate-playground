@@ -2,7 +2,12 @@ import React, { createContext, useContext, useEffect } from "react";
 import { ReactEditor, useSelected, useSlate } from "slate-react";
 import { isBlockActive } from "./common-utils";
 import { Button, Icon } from "./components";
-import { getSelectedTablePath, toggleTable } from "./table-utils";
+import {
+  getSelectedTablePath,
+  insertCol,
+  insertRow,
+  insertTable,
+} from "./table-utils";
 import { Path, Range } from "slate";
 
 import "./table.css";
@@ -88,7 +93,11 @@ const useCellSelection = (rowId: number, colIdx: number) => {
 
 // @ts-ignore
 export const TableElement = ({ style = {}, attributes, children, element }) => {
+  const editor = useSlate() as ReactEditor;
   const selectedRange = useTableSelection(element);
+  const isSelected = useSelected();
+
+  const focusedPath = editor.selection?.focus.path;
 
   // console.log(
   //   "element:",
@@ -115,6 +124,39 @@ export const TableElement = ({ style = {}, attributes, children, element }) => {
       >
         <tbody>{children}</tbody>
       </table>
+      <div contentEditable={false}>
+        <button
+          onClick={() => {
+            const targetPath = focusedPath?.slice(0, 2) ?? [];
+
+            if (targetPath.length !== 2) {
+              return;
+            }
+
+            insertRow(editor, targetPath as [number, number]);
+          }}
+          disabled={!isSelected}
+        >
+          Insert row
+        </button>
+        <button
+          onClick={() => {
+            const targetPath = focusedPath?.slice(0, 3) ?? [];
+
+            if (targetPath.length !== 3) {
+              return;
+            }
+
+            insertCol(editor, [targetPath[0], targetPath[2]] as [
+              number,
+              number
+            ]);
+          }}
+          disabled={!isSelected}
+        >
+          Insert col
+        </button>
+      </div>
     </TableContext.Provider>
   );
 };
@@ -185,7 +227,7 @@ export const TableButton = ({ icon }) => {
       active={isBlockActive(editor, "table")}
       onMouseDown={(event: { preventDefault: () => void }) => {
         event.preventDefault();
-        toggleTable(editor);
+        insertTable(editor);
       }}
     >
       <Icon>{icon}</Icon>

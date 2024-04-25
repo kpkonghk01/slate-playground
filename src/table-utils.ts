@@ -271,7 +271,7 @@ export function getSelectedTablePath(editor: Editor): Path | null {
   return tableRootPath;
 }
 
-export const toggleTable = (editor: Editor) => {
+export const insertTable = (editor: Editor) => {
   const isActive = isBlockActive(editor, "table");
 
   if (isActive) {
@@ -280,6 +280,79 @@ export const toggleTable = (editor: Editor) => {
 
   const table = initTable({ rows: 3, cols: 3 });
   Transforms.insertNodes(editor, table);
+};
+
+// Assumption: no nested table
+const getTableInfo = (editor: Editor, tableIdx: number) => {
+  const [tableNode] = Editor.node(editor, [tableIdx]);
+
+  if (
+    !tableNode ||
+    // @ts-ignore
+    tableNode.type !== "table"
+  ) {
+    return null;
+  }
+
+  // @ts-ignore
+  const numberOfRows = tableNode.children.length;
+  // @ts-ignore
+  const numberOfCols = tableNode.children[0].children.length;
+
+  return { numberOfRows, numberOfCols };
+};
+
+// target should in the form of [tableIdxAtRoot, rowIdx]
+export const insertRow = (editor: Editor, target: [number, number]) => {
+  if (target.length !== 2) {
+    // malformed target
+    return;
+  }
+
+  const [tableIdx, insertAt] = target;
+  const tableInfo = getTableInfo(editor, tableIdx);
+
+  if (!tableInfo) {
+    // target is not inside a table
+    return;
+  }
+
+  if (insertAt < 0 || insertAt > tableInfo.numberOfRows) {
+    // out of range
+    return;
+  }
+
+  const newRow = initRow(tableInfo.numberOfCols);
+
+  Transforms.insertNodes(editor, newRow, { at: target });
+};
+
+// target should in the form of [tableIdxAtRoot, colIdx]
+export const insertCol = (editor: Editor, target: [number, number]) => {
+  if (target.length !== 2) {
+    // malformed target
+    return;
+  }
+
+  const [tableIdx, insertAt] = target;
+  const tableInfo = getTableInfo(editor, tableIdx);
+
+  if (!tableInfo) {
+    // target is not inside a table
+    return;
+  }
+
+  if (insertAt < 0 || insertAt > tableInfo.numberOfCols) {
+    // out of range
+    return;
+  }
+
+  for (let rowIdx = 0; rowIdx < tableInfo.numberOfRows; rowIdx++) {
+    const newCell = initCell();
+    Transforms.insertNodes(editor, newCell, {
+      at: [tableIdx, rowIdx, insertAt],
+    });
+  }
 };
 
 export const initCell = () => {

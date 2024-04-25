@@ -2,7 +2,7 @@
 
 import React, { useCallback, useMemo } from "react";
 import isHotkey from "is-hotkey";
-import { Editable, withReact, useSlate, Slate, ReactEditor } from "slate-react";
+import { Editable, withReact, useSlate, Slate } from "slate-react";
 import {
   Editor,
   Transforms,
@@ -10,14 +10,12 @@ import {
   Descendant,
   Element as SlateElement,
   BaseEditor,
-  Point,
-  Range,
 } from "slate";
 import { withHistory } from "slate-history";
 
 import { Button, Icon, Toolbar } from "./components";
 import { isBlockActive } from "./common-utils";
-import { toggleTable, withTables } from "./table-utils";
+import { withTables } from "./table-utils";
 import {
   TableButton,
   TableCellElement,
