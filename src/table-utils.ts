@@ -327,6 +327,28 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
   Transforms.insertNodes(editor, newRow, { at: target });
 };
 
+export const deleteRow = (editor: Editor, target: [number, number]) => {
+  if (target.length !== 2) {
+    // malformed target
+    return;
+  }
+
+  const [tableIdx, deleteAt] = target;
+  const tableInfo = getTableInfo(editor, tableIdx);
+
+  if (!tableInfo) {
+    // target is not inside a table
+    return;
+  }
+
+  if (deleteAt < 0 || deleteAt >= tableInfo.numberOfRows) {
+    // out of range
+    return;
+  }
+
+  Transforms.removeNodes(editor, { at: target });
+};
+
 // target should in the form of [tableIdxAtRoot, colIdx]
 export const insertCol = (editor: Editor, target: [number, number]) => {
   if (target.length !== 2) {
@@ -352,6 +374,30 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
     Transforms.insertNodes(editor, newCell, {
       at: [tableIdx, rowIdx, insertAt],
     });
+  }
+};
+
+export const deleteCol = (editor: Editor, target: [number, number]) => {
+  if (target.length !== 2) {
+    // malformed target
+    return;
+  }
+
+  const [tableIdx, deleteAt] = target;
+  const tableInfo = getTableInfo(editor, tableIdx);
+
+  if (!tableInfo) {
+    // target is not inside a table
+    return;
+  }
+
+  if (deleteAt < 0 || deleteAt >= tableInfo.numberOfCols) {
+    // out of range
+    return;
+  }
+
+  for (let rowIdx = 0; rowIdx < tableInfo.numberOfRows; rowIdx++) {
+    Transforms.removeNodes(editor, { at: [tableIdx, rowIdx, deleteAt] });
   }
 };
 

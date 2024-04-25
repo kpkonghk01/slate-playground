@@ -3,6 +3,8 @@ import { ReactEditor, useSelected, useSlate } from "slate-react";
 import { isBlockActive } from "./common-utils";
 import { Button, Icon } from "./components";
 import {
+  deleteCol,
+  deleteRow,
   getSelectedTablePath,
   insertCol,
   insertRow,
@@ -155,6 +157,35 @@ export const TableElement = ({ style = {}, attributes, children, element }) => {
           disabled={!isSelected}
         >
           Insert col
+        </button>
+        <button
+          onClick={() => {
+            const targetPath = focusedPath?.slice(0, 2) ?? [];
+
+            if (targetPath.length !== 2) {
+              return;
+            }
+
+            deleteRow(editor, targetPath as [number, number]);
+          }}
+        >
+          Delete row
+        </button>
+        <button
+          onClick={() => {
+            const targetPath = focusedPath?.slice(0, 3) ?? [];
+
+            if (targetPath.length !== 3) {
+              return;
+            }
+
+            deleteCol(editor, [targetPath[0], targetPath[2]] as [
+              number,
+              number
+            ]);
+          }}
+        >
+          Delete col
         </button>
       </div>
     </TableContext.Provider>
