@@ -220,19 +220,6 @@ const Element = ({ attributes, children, element }) => {
 
 // @ts-ignore
 const Leaf = ({ attributes, children, leaf }) => {
-  // const editor = useSlate();
-
-  // console.log(
-  //   "leaf:",
-  //   leaf,
-  //   ", isBlock:",
-  //   Editor.isBlock(editor, leaf),
-  //   "isElement:",
-  //   SlateElement.isElement(leaf),
-  //   "isInline",
-  //   Editor.isInline(editor, leaf)
-  // );
-
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }

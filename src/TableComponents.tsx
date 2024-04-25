@@ -37,9 +37,8 @@ const useTableSelection = (element: any) => {
       setSelectedRange(null);
       return;
     }
-    // True when start and end points of the selection are equal
+    // True when start and end points of the selection equals
     // const collapsed = Range.isCollapsed(selection);
-    // console.log("collapsed:", collapsed);
 
     const tableRootPath = getSelectedTablePath(editor);
 
@@ -100,17 +99,6 @@ export const TableElement = ({ style = {}, attributes, children, element }) => {
   const isSelected = useSelected();
 
   const focusedPath = editor.selection?.focus.path;
-
-  // console.log(
-  //   "element:",
-  //   element,
-  //   ", isBlock:",
-  //   Editor.isBlock(editor, element),
-  //   "isElement:",
-  //   Element.isElement(element),
-  //   "isInline",
-  //   Editor.isInline(editor, element)
-  // );
 
   return (
     <TableContext.Provider value={{ selectedRange }}>
