@@ -23,6 +23,11 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
     return;
   }
 
+  if (tableInfo.numberOfCols === 1) {
+    // cannot delete the last col
+    return;
+  }
+
   const { tableNode, numberOfRows, numberOfCols } = tableInfo;
 
   // decrement colSpan of cells that span over the deleted col
@@ -34,7 +39,6 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
         rowIdx,
         deleteAt,
       ]);
-
       const colSpanCell = tableNode.children[rowIdx]?.children[colSpannedFrom];
 
       if (!colSpanCell) {
@@ -52,7 +56,7 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
         break breakCondition;
       }
 
-      if (colSpannedFrom + colSpanCell.colSpan - 1 > deleteAt) {
+      if (colSpannedFrom + colSpanCell.colSpan - 1 >= deleteAt) {
         // decrement the colSpanned cell
         Transforms.setNodes<CellElement>(
           editor,
@@ -61,6 +65,24 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
           },
           {
             at: [tableIdx, rowIdx, colSpannedFrom],
+          }
+        );
+      }
+    } else {
+      // not a spanned cell, but may be a span root cell
+      const spanRoot = tableNode.children[rowIdx]?.children[deleteAt];
+
+      // move span root cells to the next col and decrement colSpan
+      if (spanRoot && spanRoot.colSpan > 1) {
+        // span root cell
+        Transforms.setNodes<CellElement>(
+          editor,
+          {
+            rowSpan: spanRoot.rowSpan,
+            colSpan: spanRoot.colSpan - 1,
+          },
+          {
+            at: [tableIdx, rowIdx, deleteAt + 1],
           }
         );
       }
