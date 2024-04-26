@@ -2,6 +2,7 @@ import { Editor, Transforms } from "slate";
 import { initCell } from "../initTableElements";
 import { getTableInfo } from "../getTableInfo";
 import { CellElement } from "../../table-types";
+import { findColIdxOfSpanRoot } from "../findSpanRootCell";
 
 // target should in the form of [tableIdxAtRoot, colIdx]
 export const insertCol = (editor: Editor, target: [number, number]) => {
@@ -46,30 +47,28 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
       newCell.colSpan = 0;
 
       // extend the colSpanned cell
-      let colSpannedFrom = insertAt - 1;
+      const colSpannedFrom = findColIdxOfSpanRoot(tableNode, [
+        rowIdx,
+        insertAt,
+      ]);
 
-      while (colSpannedFrom >= 0) {
-        const colSpanCell =
-          tableInfo.tableNode.children[rowIdx]!.children[colSpannedFrom]!;
+      const colSpanCell = tableNode.children[rowIdx]!.children[colSpannedFrom]!;
 
-        if (colSpanCell.colSpan > 0) {
-          if (colSpannedFrom + colSpanCell.colSpan - 1 >= insertAt) {
-            // extend the colSpanned cell
-            Transforms.setNodes<CellElement>(
-              editor,
-              {
-                colSpan: colSpanCell.colSpan + 1,
-              },
-              {
-                at: [tableIdx, rowIdx, colSpannedFrom],
-              }
-            );
+      if (colSpanCell.colSpan === 0) {
+        continue;
+      }
+
+      if (colSpannedFrom + colSpanCell.colSpan - 1 >= insertAt) {
+        // extend the colSpanned cell
+        Transforms.setNodes<CellElement>(
+          editor,
+          {
+            colSpan: colSpanCell.colSpan + 1,
+          },
+          {
+            at: [tableIdx, rowIdx, colSpannedFrom],
           }
-
-          break;
-        }
-
-        colSpannedFrom--;
+        );
       }
     }
 
