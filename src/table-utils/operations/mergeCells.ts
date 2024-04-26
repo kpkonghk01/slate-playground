@@ -45,6 +45,7 @@ export const mergeCells = (
         continue;
       }
 
+      // FIXME: also remove the children content of the merged cells
       Transforms.setNodes<CellElement>(
         editor,
         {

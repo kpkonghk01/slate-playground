@@ -321,6 +321,11 @@ const MarkButton = ({ format, icon }) => {
 
 const initialValue: Descendant[] = [
   {
+    // @ts-ignore
+    type: "paragraph",
+    children: [{ text: "" }],
+  },
+  {
     type: "table",
     children: [
       {
@@ -336,7 +341,1205 @@ const initialValue: Descendant[] = [
                 type: "paragraph",
                 children: [
                   {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 7,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 9,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 3,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 3,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 3,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
                     text: "1",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "2",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "3",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 3,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 3,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 3,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 3,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "15",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "6",
                   },
                 ],
               },
@@ -368,6 +1571,22 @@ const initialValue: Descendant[] = [
                 type: "paragraph",
                 children: [
                   {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
                     text: "3",
                   },
                 ],
@@ -389,7 +1608,7 @@ const initialValue: Descendant[] = [
                 type: "paragraph",
                 children: [
                   {
-                    text: "4",
+                    text: "",
                   },
                 ],
               },
@@ -405,7 +1624,7 @@ const initialValue: Descendant[] = [
                 type: "paragraph",
                 children: [
                   {
-                    text: "5",
+                    text: "",
                   },
                 ],
               },
@@ -415,6 +1634,496 @@ const initialValue: Descendant[] = [
             type: "table-cell",
             rowSpan: 1,
             colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 3,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 3,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "7",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "8",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 3,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 3,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "9",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 3,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 3,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "5",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
             children: [
               {
                 // @ts-ignore
@@ -442,7 +2151,7 @@ const initialValue: Descendant[] = [
                 type: "paragraph",
                 children: [
                   {
-                    text: "7",
+                    text: "",
                   },
                 ],
               },
@@ -458,7 +2167,7 @@ const initialValue: Descendant[] = [
                 type: "paragraph",
                 children: [
                   {
-                    text: "8",
+                    text: "",
                   },
                 ],
               },
@@ -468,6 +2177,315 @@ const initialValue: Descendant[] = [
             type: "table-cell",
             rowSpan: 1,
             colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 2,
+            colSpan: 3,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 7,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "7",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "8",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
+            children: [
+              {
+                // @ts-ignore
+                type: "paragraph",
+                children: [
+                  {
+                    text: "",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 0,
+            colSpan: 0,
             children: [
               {
                 // @ts-ignore

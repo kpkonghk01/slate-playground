@@ -1,4 +1,4 @@
-import { Editor, Range, Transforms } from "slate";
+import { Editor, Path, Range, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
 import { getSelectedTablePath } from "./getSelectedTablePath";
 
@@ -23,19 +23,32 @@ export const withInsertTextInTable = (editor: ReactEditor) => {
 
     const selectedTablePath = getSelectedTablePath(editor);
 
-    if (selectedTablePath === null) {
+    if (selectedTablePath !== null) {
+      // selection is inside a table
+
       // FIXME: the focus is not correct when the selection is backward, but Range.isBackward is always false, the selection looks always forward
       // plate.js has the same issue
 
-      // selection is inside a table and cross cells
-      // insert text to the focused cell
-      insertText(text, { at: selection.focus });
+      const anchorCellPath = selection.anchor.path.slice(0, 3);
+      const focusCellPath = selection.focus.path.slice(0, 3);
+      const isOnlyOneCellSelected =
+        anchorCellPath.length === 3 &&
+        focusCellPath.length === 3 &&
+        Path.equals(anchorCellPath, focusCellPath);
 
-      // reset the selection to the focus
-      Transforms.select(editor, {
-        anchor: selection.focus,
-        focus: selection.focus,
-      });
+      if (isOnlyOneCellSelected) {
+        insertText(text);
+      } else {
+        // selection is inside a table and cross cells
+        // reset the selection to the focus
+        Transforms.select(editor, {
+          anchor: selection.focus,
+          focus: selection.focus,
+        });
+
+        // insert text to the focused cell
+        insertText(text, { at: selection.focus });
+      }
 
       return;
     }
@@ -58,7 +71,7 @@ export const withInsertTextInTable = (editor: ReactEditor) => {
       return;
     }
 
-    // no cell in the selection
+    // no table in the selection
     insertText(text);
 
     return;

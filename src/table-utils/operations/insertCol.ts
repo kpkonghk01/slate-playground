@@ -1,8 +1,9 @@
 import { Editor, Transforms } from "slate";
 import { initCell } from "../initTableElements";
 import { getTableInfo } from "../getTableInfo";
-import { CellElement } from "../../table-types";
+import { CellElement, TableElement } from "../../table-types";
 import { findColIdxOfSpanRoot } from "../findSpanRootCell";
+import { getSpannedRowIndexesOfCol } from "../getSpannedRowIndexesOfCol";
 
 // target should in the form of [tableIdxAtRoot, colIdx]
 export const insertCol = (editor: Editor, target: [number, number]) => {
@@ -26,23 +27,12 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
     return;
   }
 
-  const colSpannedAt = new Set<number>();
-
-  for (let rowIdx = 0; rowIdx < numberOfRows; rowIdx++) {
-    const checkCell = tableNode.children[rowIdx]!.children[insertAt]!;
-
-    if (checkCell.rowSpan === 0) {
-      colSpannedAt.add(rowIdx);
-    } else {
-      // skip rowSpanned cells
-      rowIdx += checkCell.rowSpan - 1;
-    }
-  }
+  const colSpannedAt = getSpannedRowIndexesOfCol(tableNode, insertAt);
 
   for (let rowIdx = 0; rowIdx < numberOfRows; rowIdx++) {
     const newCell = initCell();
 
-    if (colSpannedAt.has(rowIdx)) {
+    breakCondition: if (colSpannedAt.has(rowIdx)) {
       newCell.rowSpan = 0;
       newCell.colSpan = 0;
 
@@ -52,10 +42,21 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
         insertAt,
       ]);
 
-      const colSpanCell = tableNode.children[rowIdx]!.children[colSpannedFrom]!;
+      const colSpanCell = tableNode.children[rowIdx]?.children[colSpannedFrom];
+
+      if (!colSpanCell) {
+        // malformed table
+        console.error("colSpanCell not found", tableNode, [
+          rowIdx,
+          colSpannedFrom,
+        ]);
+
+        break breakCondition;
+      }
 
       if (colSpanCell.colSpan === 0) {
-        continue;
+        // boarder cell
+        break breakCondition;
       }
 
       if (colSpannedFrom + colSpanCell.colSpan - 1 >= insertAt) {

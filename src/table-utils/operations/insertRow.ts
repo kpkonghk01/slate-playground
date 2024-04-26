@@ -3,6 +3,7 @@ import { CellElement } from "../../table-types";
 import { initRow } from "../initTableElements";
 import { getTableInfo } from "../getTableInfo";
 import { findRowIdxOfSpanRoot } from "../findSpanRootCell";
+import { getSpannedColIndexesOfRow } from "../getSpannedColIndexesOfRow";
 
 // target should in the form of [tableIdxAtRoot, rowIdx]
 export const insertRow = (editor: Editor, target: [number, number]) => {
@@ -26,19 +27,7 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
     return;
   }
 
-  const rowSpannedAt = new Set<number>();
-
-  for (let colIdx = 0; colIdx < numberOfCols; colIdx++) {
-    // @ts-ignore
-    const checkCell = tableNode.children[insertAt].children[colIdx]!;
-
-    if (checkCell.colSpan === 0) {
-      rowSpannedAt.add(colIdx);
-    } else {
-      // skip colSpanned cells
-      colIdx += checkCell.colSpan - 1;
-    }
-  }
+  const rowSpannedAt = getSpannedColIndexesOfRow(tableNode, insertAt);
 
   const newRow = initRow(numberOfCols);
 
