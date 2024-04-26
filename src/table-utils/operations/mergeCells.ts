@@ -1,6 +1,7 @@
-import { Editor, Transforms } from "slate";
+import { Editor, Node, NodeEntry, Transforms } from "slate";
 import { CellElement, CellsRange } from "../../table-types";
 import { getTableInfo } from "../getTableInfo";
+import { initCell } from "../initTableElements";
 
 export const mergeCells = (
   editor: Editor,
@@ -45,17 +46,31 @@ export const mergeCells = (
         continue;
       }
 
-      // FIXME: also remove the children content of the merged cells
-      Transforms.setNodes<CellElement>(
-        editor,
-        {
-          rowSpan: 0,
-          colSpan: 0,
-        },
-        {
+      // Operations need to batched to avoid normalization in the middle of the operation
+      Editor.withoutNormalizing(editor, () => {
+        // remove the children content of the merged cells
+        Transforms.removeNodes(editor, {
           at: [tableIdx, rowIdx, colIdx],
-        }
-      );
+        });
+
+        Transforms.insertNodes<CellElement>(
+          editor,
+          {
+            ...initCell(),
+            rowSpan: 0,
+            colSpan: 0,
+          } as NodeEntry<CellElement>[0],
+          {
+            at: [tableIdx, rowIdx, colIdx],
+          }
+        );
+      });
     }
   }
+
+  // select the root of the merged cells, last "0, 0" is for focusing to the first text node of the first element in the cell
+  Transforms.select(editor, {
+    anchor: { path: [tableIdx, startRow, startCol, 0, 0], offset: 0 },
+    focus: { path: [tableIdx, startRow, startCol, 0, 0], offset: 0 },
+  });
 };
