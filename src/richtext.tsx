@@ -15,13 +15,13 @@ import { withHistory } from "slate-history";
 
 import { Button, Icon, Toolbar } from "./components";
 import { isBlockActive } from "./common-utils";
-import { withTables } from "./table-utils";
 import {
   TableButton,
   TableCellElement,
   TableElement,
   TableRowElement,
 } from "./TableComponents";
+import { withTable } from "./table-utils";
 
 const HOTKEYS = {
   "mod+b": "bold",
@@ -41,7 +41,7 @@ const RichTextExample = ({
   const renderElement = useCallback((props: any) => <Element {...props} />, []);
   const renderLeaf = useCallback((props: any) => <Leaf {...props} />, []);
   const editor = useMemo(
-    () => withTables(withHistory(withReact(createEditor()))),
+    () => withTable(withHistory(withReact(createEditor()))),
     []
   );
 
