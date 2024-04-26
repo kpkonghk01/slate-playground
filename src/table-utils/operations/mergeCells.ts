@@ -1,5 +1,5 @@
 import { Editor, Transforms } from "slate";
-import { CellsRange } from "../../table-types";
+import { CellElement, CellsRange } from "../../table-types";
 import { getTableInfo } from "../getTableInfo";
 
 export const mergeCells = (
@@ -30,12 +30,10 @@ export const mergeCells = (
   for (let rowIdx = startRow; rowIdx <= endRow; rowIdx++) {
     for (let colIdx = startCol; colIdx <= endCol; colIdx++) {
       if (rowIdx === startRow && colIdx === startCol) {
-        Transforms.setNodes(
+        Transforms.setNodes<CellElement>(
           editor,
           {
-            // @ts-ignore
             rowSpan: endRow - startRow + 1,
-            // @ts-ignore
             colSpan: endCol - startCol + 1,
           },
           {
@@ -47,12 +45,10 @@ export const mergeCells = (
         continue;
       }
 
-      Transforms.setNodes(
+      Transforms.setNodes<CellElement>(
         editor,
         {
-          // @ts-ignore
           rowSpan: 0,
-          // @ts-ignore
           colSpan: 0,
         },
         {

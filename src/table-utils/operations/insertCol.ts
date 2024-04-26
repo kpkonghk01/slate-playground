@@ -1,6 +1,7 @@
 import { Editor, Transforms } from "slate";
 import { initCell } from "../initTableElements";
 import { getTableInfo } from "../getTableInfo";
+import { CellElement } from "../../table-types";
 
 // target should in the form of [tableIdxAtRoot, colIdx]
 export const insertCol = (editor: Editor, target: [number, number]) => {
@@ -54,10 +55,9 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
         if (colSpanCell.colSpan > 0) {
           if (colSpannedFrom + colSpanCell.colSpan - 1 >= insertAt) {
             // extend the colSpanned cell
-            Transforms.setNodes(
+            Transforms.setNodes<CellElement>(
               editor,
               {
-                // @ts-ignore
                 colSpan: colSpanCell.colSpan + 1,
               },
               {

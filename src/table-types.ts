@@ -13,3 +13,8 @@ export type RowElement = {
   type: "table-row";
   children: CellElement[];
 };
+
+export type TableElement = {
+  type: "table";
+  children: RowElement[];
+};

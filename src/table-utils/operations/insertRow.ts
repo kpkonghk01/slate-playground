@@ -58,10 +58,9 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
         if (rowSpanCell.rowSpan > 0) {
           if (rowSpannedFrom + rowSpanCell.rowSpan - 1 >= insertAt) {
             // extend the rowSpanned cell
-            Transforms.setNodes(
+            Transforms.setNodes<CellElement>(
               editor,
               {
-                // @ts-ignore
                 rowSpan: rowSpanCell.rowSpan + 1,
               },
               {

@@ -1,17 +1,19 @@
-import { CellElement, RowElement } from "../table-types";
+import { CellElement, RowElement, TableElement } from "../table-types";
+
+type InitTableProps = {
+  rows?: number;
+  cols?: number;
+};
 
 export const initTable = ({
   rows = 3,
   cols = 3,
-}: {
-  rows?: number;
-  cols?: number;
-}) => {
+}: InitTableProps): TableElement => {
   const table = {
-    type: "table",
+    type: "table" as const,
     // colWidths: [],
     // rowHights: [],
-    children: [],
+    children: [] as RowElement[],
   };
 
   for (let rowIdx = 0; rowIdx < rows; rowIdx++) {
