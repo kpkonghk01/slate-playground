@@ -27,7 +27,7 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
 
   for (let colIdx = 0; colIdx < tableInfo.numberOfCols; colIdx++) {
     // @ts-ignore
-    const checkCell = tableInfo.tableNode.children[insertAt].children[colIdx];
+    const checkCell = tableInfo.tableNode.children[insertAt].children[colIdx]!;
 
     if (checkCell.colSpan === 0) {
       rowSpannedAt.add(colIdx);
@@ -52,8 +52,7 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
 
       while (rowSpannedFrom >= 0) {
         const rowSpanCell =
-          // @ts-ignore
-          tableInfo.tableNode.children[rowSpannedFrom].children[colIdx];
+          tableInfo.tableNode.children[rowSpannedFrom]!.children[colIdx]!;
 
         if (rowSpanCell.rowSpan > 0) {
           if (rowSpannedFrom + rowSpanCell.rowSpan - 1 >= insertAt) {

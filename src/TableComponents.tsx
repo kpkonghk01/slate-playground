@@ -6,6 +6,7 @@ import {
   deleteCol,
   deleteRow,
   getSelectedTablePath,
+  getTableInfo,
   insertCol,
   insertRow,
   insertTable,
@@ -78,6 +79,46 @@ const useTableSelection = (element: any) => {
     ];
 
     // TODO: scan the border, see if any cell is merged and expand the range if necessary
+    const tableInfo = getTableInfo(editor, tableRootPath[0]!);
+
+    if (!tableInfo) {
+      // should not happen
+      return;
+    }
+
+    const { tableNode, numberOfRows, numberOfCols } = tableInfo;
+    let expansionDetected = false;
+
+    do {
+      expansionDetected = false;
+
+      const [[startRow, startCol], [endRow, endCol]] = normalizedSelectedRange;
+
+      // expand the range if any cell is merged
+      for (let row = startRow; row <= endRow; row++) {
+        for (let col = startCol; col <= endCol; col++) {
+          const cell = tableNode.children[row]!.children[col]!;
+
+          // TODO: handle merged cells
+
+          // if (cell.colSpan > 1) {
+          //   normalizedSelectedRange[1][1] = Math.max(
+          //     normalizedSelectedRange[1][1],
+          //     col + cell.colSpan - 1
+          //   );
+          //   expansionDetected = true;
+          // }
+
+          // if (cell.rowSpan > 1) {
+          //   normalizedSelectedRange[1][0] = Math.max(
+          //     normalizedSelectedRange[1][0],
+          //     row + cell.rowSpan - 1
+          //   );
+          //   expansionDetected = true;
+          // }
+        }
+      }
+    } while (expansionDetected);
 
     setSelectedRange(normalizedSelectedRange);
   }, [editor, isSelected, selection]);

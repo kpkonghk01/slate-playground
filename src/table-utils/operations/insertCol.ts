@@ -18,16 +18,17 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
     return;
   }
 
-  if (insertAt < 0 || insertAt > tableInfo.numberOfCols) {
+  const { tableNode, numberOfRows, numberOfCols } = tableInfo;
+
+  if (insertAt < 0 || insertAt > numberOfCols) {
     // out of range
     return;
   }
 
   const colSpannedAt = new Set<number>();
 
-  for (let rowIdx = 0; rowIdx < tableInfo.numberOfRows; rowIdx++) {
-    // @ts-ignore
-    const checkCell = tableInfo.tableNode.children[rowIdx].children[insertAt];
+  for (let rowIdx = 0; rowIdx < numberOfRows; rowIdx++) {
+    const checkCell = tableNode.children[rowIdx]!.children[insertAt]!;
 
     if (checkCell.rowSpan === 0) {
       colSpannedAt.add(rowIdx);
@@ -37,7 +38,7 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
     }
   }
 
-  for (let rowIdx = 0; rowIdx < tableInfo.numberOfRows; rowIdx++) {
+  for (let rowIdx = 0; rowIdx < numberOfRows; rowIdx++) {
     const newCell = initCell();
 
     if (colSpannedAt.has(rowIdx)) {
@@ -49,8 +50,7 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
 
       while (colSpannedFrom >= 0) {
         const colSpanCell =
-          // @ts-ignore
-          tableInfo.tableNode.children[rowIdx].children[colSpannedFrom];
+          tableInfo.tableNode.children[rowIdx]!.children[colSpannedFrom]!;
 
         if (colSpanCell.colSpan > 0) {
           if (colSpannedFrom + colSpanCell.colSpan - 1 >= insertAt) {
