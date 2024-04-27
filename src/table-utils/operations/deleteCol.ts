@@ -18,7 +18,9 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
     return;
   }
 
-  if (deleteAt < 0 || deleteAt >= tableInfo.numberOfCols) {
+  const { tableNode, numberOfRows, numberOfCols } = tableInfo;
+
+  if (deleteAt < 0 || deleteAt >= numberOfCols) {
     // out of range
     return;
   }
@@ -28,12 +30,10 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
     return;
   }
 
-  const { tableNode, numberOfRows, numberOfCols } = tableInfo;
-
   // decrement colSpan of cells that span over the deleted col
   const colSpannedAt = getSpannedRowIndexesOfCol(tableNode, deleteAt);
 
-  for (let rowIdx = 0; rowIdx < tableInfo.numberOfRows; rowIdx++) {
+  for (let rowIdx = 0; rowIdx < numberOfRows; rowIdx++) {
     breakCondition: if (colSpannedAt.has(rowIdx)) {
       const colSpannedFrom = findColIdxOfSpanRoot(tableNode, [
         rowIdx,

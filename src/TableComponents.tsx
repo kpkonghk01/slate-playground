@@ -11,6 +11,7 @@ import {
   insertRow,
   insertTable,
   mergeCells,
+  splitCell,
 } from "./table-utils";
 import { Path, Range } from "slate";
 
@@ -77,6 +78,15 @@ const useTableSelection = (element: any) => {
         Math.max(currentSelectedRange[0][1], currentSelectedRange[1][1]),
       ],
     ];
+
+    if (
+      normalizedSelectedRange[0][0] === normalizedSelectedRange[1][0] &&
+      normalizedSelectedRange[0][1] === normalizedSelectedRange[1][1]
+    ) {
+      // single cell selected
+      setSelectedRange(null);
+      return;
+    }
 
     // TODO: scan the border, see if any cell is merged and expand the range if necessary
     const tableInfo = getTableInfo(editor, tableRootPath[0]!);
@@ -262,6 +272,23 @@ export const TableElement = ({ style = {}, attributes, children, element }) => {
           disabled={!isSelected || !selectedRange}
         >
           Merge cells
+        </button>
+        <button
+          onClick={() => {
+            const [tableIdx, rowIdx, colIdx] = focusedPath?.slice(0, 3) ?? [];
+
+            if (
+              tableIdx === undefined ||
+              rowIdx === undefined ||
+              colIdx === undefined
+            ) {
+              return;
+            }
+
+            splitCell(editor, [tableIdx, rowIdx, colIdx]);
+          }}
+        >
+          Split cell
         </button>
       </div>
     </TableContext.Provider>

@@ -28,26 +28,27 @@ export const mergeCells = (
   }
 
   // merge cells
-  for (let rowIdx = startRow; rowIdx <= endRow; rowIdx++) {
-    for (let colIdx = startCol; colIdx <= endCol; colIdx++) {
-      if (rowIdx === startRow && colIdx === startCol) {
-        Transforms.setNodes<CellElement>(
-          editor,
-          {
-            rowSpan: endRow - startRow + 1,
-            colSpan: endCol - startCol + 1,
-          },
-          {
-            at: [tableIdx, rowIdx, colIdx],
-          }
-        );
 
-        // skip the first cell
-        continue;
-      }
+  // Operations need to batched to avoid normalization in the middle of the operation
+  Editor.withoutNormalizing(editor, () => {
+    for (let rowIdx = startRow; rowIdx <= endRow; rowIdx++) {
+      for (let colIdx = startCol; colIdx <= endCol; colIdx++) {
+        if (rowIdx === startRow && colIdx === startCol) {
+          Transforms.setNodes<CellElement>(
+            editor,
+            {
+              rowSpan: endRow - startRow + 1,
+              colSpan: endCol - startCol + 1,
+            },
+            {
+              at: [tableIdx, rowIdx, colIdx],
+            }
+          );
 
-      // Operations need to batched to avoid normalization in the middle of the operation
-      Editor.withoutNormalizing(editor, () => {
+          // skip the first cell
+          continue;
+        }
+
         // remove the children content of the merged cells
         Transforms.removeNodes(editor, {
           at: [tableIdx, rowIdx, colIdx],
@@ -64,13 +65,18 @@ export const mergeCells = (
             at: [tableIdx, rowIdx, colIdx],
           }
         );
-      });
+      }
     }
-  }
 
-  // select the root of the merged cells, last "0, 0" is for focusing to the first text node of the first element in the cell
-  Transforms.select(editor, {
-    anchor: { path: [tableIdx, startRow, startCol, 0, 0], offset: 0 },
-    focus: { path: [tableIdx, startRow, startCol, 0, 0], offset: 0 },
+    // select the root of the merged cells, last "0, 0" is for focusing to the first text node of the first element in the cell
+    // FIXME: not work as expected
+    console.info(
+      "expect the selection to be focused on the first cell after merge, but it becomes a range selection"
+    );
+
+    Transforms.select(
+      editor,
+      Editor.start(editor, [tableIdx, startRow, startCol, 0, 0])
+    );
   });
 };

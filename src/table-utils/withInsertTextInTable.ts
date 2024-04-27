@@ -64,7 +64,7 @@ export const withInsertTextInTable = (editor: ReactEditor) => {
     if (!cellsGenerator.next().done) {
       // cross table selection with non table elements
       // TODO: behavior TBD
-      console.log(
+      console.info(
         "unhandled case: cross table selection with non table elements"
       );
 
