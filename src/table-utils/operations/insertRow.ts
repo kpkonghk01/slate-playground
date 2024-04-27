@@ -2,7 +2,7 @@ import { Editor, Transforms } from "slate";
 import { CellElement } from "../../table-types";
 import { initRow } from "../initTableElements";
 import { getTableInfo } from "../getTableInfo";
-import { findRowIdxOfSpanRoot } from "../findSpanRootCell";
+import { findSpanRootLocation } from "../findSpanRootLocation";
 import { getSpannedColIndexesOfRow } from "../getSpannedColIndexesOfRow";
 
 // target should in the form of [tableIdxAtRoot, rowIdx]
@@ -43,13 +43,15 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
     newCell.colSpan = 0;
 
     // find the root span cell if it is in the same column
-    const rowSpannedFrom = findRowIdxOfSpanRoot(tableNode, [insertAt, colIdx]);
+    const spanRootAt = findSpanRootLocation(tableNode, [insertAt, colIdx]);
 
-    const rowSpanCell = tableNode.children[rowSpannedFrom]!.children[colIdx]!;
-
-    if (colIdx === 13) {
-      console.log(rowSpanCell, rowSpannedFrom);
+    if (!spanRootAt) {
+      // malformed table
+      continue;
     }
+
+    const [rowSpannedFrom] = spanRootAt;
+    const rowSpanCell = tableNode.children[rowSpannedFrom]!.children[colIdx]!;
 
     if (rowSpanCell.rowSpan === 0) {
       continue;

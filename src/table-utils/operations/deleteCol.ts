@@ -2,7 +2,7 @@ import { Editor, Transforms } from "slate";
 import { getTableInfo } from "../getTableInfo";
 import { getSpannedRowIndexesOfCol } from "../getSpannedRowIndexesOfCol";
 import { CellElement } from "../../table-types";
-import { findColIdxOfSpanRoot } from "../findSpanRootCell";
+import { findSpanRootLocation } from "../findSpanRootLocation";
 
 export const deleteCol = (editor: Editor, target: [number, number]) => {
   if (target.length !== 2) {
@@ -35,10 +35,14 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
 
   for (let rowIdx = 0; rowIdx < numberOfRows; rowIdx++) {
     breakCondition: if (colSpannedAt.has(rowIdx)) {
-      const colSpannedFrom = findColIdxOfSpanRoot(tableNode, [
-        rowIdx,
-        deleteAt,
-      ]);
+      const spanRootAt = findSpanRootLocation(tableNode, [rowIdx, deleteAt]);
+
+      if (!spanRootAt) {
+        // malformed table
+        break breakCondition;
+      }
+
+      const [, colSpannedFrom] = spanRootAt;
       const colSpanCell = tableNode.children[rowIdx]?.children[colSpannedFrom];
 
       if (!colSpanCell) {

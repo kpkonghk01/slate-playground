@@ -12,13 +12,14 @@ export function getSelectedTablePath(editor: Editor): Path | null {
   const range = Editor.unhangRange(editor, selection, { voids: true });
 
   // @ts-ignore
-  const [tableAbove, path] = Editor.above<TableElement>(editor, {
-    at: range,
-    // @ts-ignore
-    match: (n) => n.type === "table",
-  });
+  const [tableAbove, path] =
+    Editor.above<TableElement>(editor, {
+      at: range,
+      // @ts-ignore
+      match: (n) => n.type === "table",
+    }) ?? [];
 
-  if (!tableAbove) {
+  if (!tableAbove || !path) {
     // when the selection crosses root elements
     return null;
   }

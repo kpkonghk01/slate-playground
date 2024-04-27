@@ -1,8 +1,8 @@
 import { Editor, Transforms } from "slate";
 import { initCell } from "../initTableElements";
 import { getTableInfo } from "../getTableInfo";
-import { CellElement, TableElement } from "../../table-types";
-import { findColIdxOfSpanRoot } from "../findSpanRootCell";
+import { CellElement } from "../../table-types";
+import { findSpanRootLocation } from "../findSpanRootLocation";
 import { getSpannedRowIndexesOfCol } from "../getSpannedRowIndexesOfCol";
 
 // target should in the form of [tableIdxAtRoot, colIdx]
@@ -37,11 +37,14 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
       newCell.colSpan = 0;
 
       // extend the colSpanned cell
-      const colSpannedFrom = findColIdxOfSpanRoot(tableNode, [
-        rowIdx,
-        insertAt,
-      ]);
+      const spanRootAt = findSpanRootLocation(tableNode, [rowIdx, insertAt]);
 
+      if (!spanRootAt) {
+        // malformed table
+        break breakCondition;
+      }
+
+      const [, colSpannedFrom] = spanRootAt;
       const colSpanCell = tableNode.children[rowIdx]?.children[colSpannedFrom];
 
       if (!colSpanCell) {

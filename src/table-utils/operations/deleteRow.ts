@@ -1,7 +1,7 @@
 import { Editor, Transforms } from "slate";
 import { getTableInfo } from "../getTableInfo";
 import { getSpannedColIndexesOfRow } from "../getSpannedColIndexesOfRow";
-import { findRowIdxOfSpanRoot } from "../findSpanRootCell";
+import { findSpanRootLocation } from "../findSpanRootLocation";
 import { CellElement } from "../../table-types";
 
 export const deleteRow = (editor: Editor, target: [number, number]) => {
@@ -56,7 +56,14 @@ export const deleteRow = (editor: Editor, target: [number, number]) => {
       continue;
     }
 
-    const rowSpannedFrom = findRowIdxOfSpanRoot(tableNode, [deleteAt, colIdx]);
+    const spanRootAt = findSpanRootLocation(tableNode, [deleteAt, colIdx]);
+
+    if (!spanRootAt) {
+      // malformed table
+      continue;
+    }
+
+    const [rowSpannedFrom] = spanRootAt;
     const rowSpanCell = tableNode.children[rowSpannedFrom]?.children[colIdx];
 
     if (!rowSpanCell) {
