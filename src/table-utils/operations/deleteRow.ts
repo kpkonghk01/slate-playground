@@ -76,7 +76,7 @@ export const deleteRow = (editor: Editor, target: [number, number]) => {
     }
 
     if (rowSpanCell.rowSpan === 0) {
-      // boarder cell
+      // border cell
       continue;
     }
 

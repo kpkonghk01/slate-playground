@@ -56,7 +56,7 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
       }
 
       if (colSpanCell.colSpan === 0) {
-        // boarder cell
+        // border cell
         break breakCondition;
       }
 
