@@ -15,12 +15,7 @@ import { withHistory } from "slate-history";
 
 import { Button, Icon, Toolbar } from "./components";
 import { isBlockActive } from "./common-utils";
-import {
-  TableButton,
-  TableCellElement,
-  TableElement,
-  TableRowElement,
-} from "./TableComponents";
+import { TableButton, TableCell, Table, TableRow } from "./TableComponents";
 import { withTable } from "./table-utils";
 
 const HOTKEYS = {
@@ -185,29 +180,21 @@ const Element = ({ attributes, children, element }) => {
       );
     case "table":
       return (
-        <TableElement style={style} attributes={attributes} element={element}>
+        <Table style={style} attributes={attributes} element={element}>
           {children}
-        </TableElement>
+        </Table>
       );
     case "table-row":
       return (
-        <TableRowElement
-          style={style}
-          attributes={attributes}
-          element={element}
-        >
+        <TableRow style={style} attributes={attributes} element={element}>
           {children}
-        </TableRowElement>
+        </TableRow>
       );
     case "table-cell":
       return (
-        <TableCellElement
-          style={style}
-          attributes={attributes}
-          element={element}
-        >
+        <TableCell style={style} attributes={attributes} element={element}>
           {children}
-        </TableCellElement>
+        </TableCell>
       );
     default:
       return (
@@ -2515,6 +2502,10 @@ const initialValue = [
   },
   {
     type: "table",
+    settings: {
+      colSizes: Array.from({ length: 11 }, () => 0),
+      rowSizes: Array.from({ length: 12 }, () => 0),
+    },
     children: [
       {
         type: "table-row",

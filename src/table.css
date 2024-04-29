@@ -6,3 +6,31 @@
 .table-in-selection .cell-selected {
   background-color: lightgrey;
 }
+
+.table-resize-handle {
+  position: absolute;
+
+  opacity: 0;
+  z-index: 1;
+  background-color: black;
+}
+
+.table-resize-handle:hover {
+  opacity: 1;
+}
+
+.column-resize-handle {
+  cursor: col-resize;
+  width: 2px;
+  height: 100%;
+  top: 0;
+  right: -1px;
+}
+
+.row-resize-handle {
+  cursor: row-resize;
+  width: 100%;
+  height: 2px;
+  bottom: -1px;
+  left: 0;
+}

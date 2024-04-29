@@ -2,7 +2,7 @@ import { Editor, Transforms } from "slate";
 import { getTableInfo } from "../getTableInfo";
 import { getSpannedColIndexesOfRow } from "../getSpannedColIndexesOfRow";
 import { findSpanRootLocation } from "../findSpanRootLocation";
-import { CellElement } from "../../table-types";
+import { CellElement, TableElement } from "../../table-types";
 
 export const deleteRow = (editor: Editor, target: [number, number]) => {
   if (target.length !== 2) {
@@ -94,5 +94,18 @@ export const deleteRow = (editor: Editor, target: [number, number]) => {
     }
   }
 
+  Transforms.setNodes<TableElement>(
+    editor,
+    {
+      settings: {
+        colSizes: tableNode.settings.colSizes,
+        rowSizes: [
+          ...tableNode.settings.rowSizes.slice(0, deleteAt),
+          ...tableNode.settings.rowSizes.slice(deleteAt + 1),
+        ],
+      },
+    },
+    { at: [tableIdx] }
+  );
   Transforms.removeNodes(editor, { at: target });
 };

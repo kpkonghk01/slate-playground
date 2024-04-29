@@ -11,8 +11,10 @@ export const initTable = ({
 }: InitTableProps): TableElement => {
   const table = {
     type: "table" as const,
-    // colWidths: [],
-    // rowHights: [],
+    settings: {
+      colSizes: Array.from({ length: cols }, () => 0),
+      rowSizes: Array.from({ length: rows }, () => 0),
+    },
     children: [] as RowElement[],
   };
 
@@ -20,6 +22,8 @@ export const initTable = ({
     // @ts-ignore
     table.children.push(initRow(cols));
   }
+
+  console.log("init", table);
 
   return table;
 };

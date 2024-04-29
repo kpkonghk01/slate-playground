@@ -1,5 +1,5 @@
 import { Editor, Transforms } from "slate";
-import { CellElement } from "../../table-types";
+import { CellElement, TableElement } from "../../table-types";
 import { initRow } from "../initTableElements";
 import { getTableInfo } from "../getTableInfo";
 import { findSpanRootLocation } from "../findSpanRootLocation";
@@ -71,5 +71,19 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
     }
   }
 
+  Transforms.setNodes<TableElement>(
+    editor,
+    {
+      settings: {
+        colSizes: tableNode.settings.colSizes,
+        rowSizes: [
+          ...tableNode.settings.rowSizes.slice(0, insertAt),
+          0,
+          ...tableNode.settings.rowSizes.slice(insertAt),
+        ],
+      },
+    },
+    { at: [tableIdx] }
+  );
   Transforms.insertNodes(editor, newRow, { at: target });
 };

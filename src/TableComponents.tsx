@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { ReactEditor, useSelected, useSlate } from "slate-react";
 import { isBlockActive } from "./common-utils";
 import { Button, Icon } from "./components";
@@ -16,7 +22,7 @@ import {
 import { Path, Range } from "slate";
 
 import "./table.css";
-import { CellsRange } from "./table-types";
+import { CellsRange, TableElement } from "./table-types";
 import { findSpanRootLocation } from "./table-utils/findSpanRootLocation";
 import { findSpanCornerLocation } from "./table-utils/findSpanCornerLocation";
 
@@ -261,6 +267,10 @@ const useTableSelection = (element: any) => {
 
 const TableContext = createContext({
   selectedRange: null as CellsRange | null,
+  settings: {
+    colSizes: [],
+    rowSizes: [],
+  } as TableElement["settings"],
 });
 
 const useCellSelection = (range: CellsRange) => {
@@ -295,8 +305,15 @@ const useCellSelection = (range: CellsRange) => {
   return false;
 };
 
-// @ts-ignore
-export const TableElement = ({ style = {}, attributes, children, element }) => {
+export const Table = ({
+  style = {},
+  // @ts-ignore
+  attributes,
+  // @ts-ignore
+  children,
+  // @ts-ignore
+  element,
+}) => {
   const editor = useSlate() as ReactEditor;
   const selectedRange = useTableSelection(element);
   const isSelected = useSelected();
@@ -304,7 +321,9 @@ export const TableElement = ({ style = {}, attributes, children, element }) => {
   const focusedPath = editor.selection?.focus.path;
 
   return (
-    <TableContext.Provider value={{ selectedRange }}>
+    <TableContext.Provider
+      value={{ selectedRange, settings: element.settings }}
+    >
       <table
         style={{
           ...style,
@@ -313,8 +332,24 @@ export const TableElement = ({ style = {}, attributes, children, element }) => {
           tableLayout: "fixed",
         }}
         className={selectedRange ? "table-in-selection" : ""}
+        onMouseUp={(event) => {
+          console.log("mouse up", element, {
+            x: event.clientX,
+            y: event.clientY,
+          });
+        }}
         {...attributes}
       >
+        <colgroup>
+          {(element as TableElement).settings.colSizes.map((colSize, idx) => (
+            <col
+              key={idx}
+              style={{
+                minWidth: `${colSize}px`,
+              }}
+            />
+          ))}
+        </colgroup>
         <tbody>{children}</tbody>
       </table>
       <div contentEditable={false}>
@@ -418,7 +453,7 @@ export const TableElement = ({ style = {}, attributes, children, element }) => {
   );
 };
 
-export const TableRowElement = ({
+export const TableRow = ({
   style = {},
   // @ts-ignore
   attributes,
@@ -434,7 +469,7 @@ export const TableRowElement = ({
   );
 };
 
-export const TableCellElement = ({
+export const TableCell = ({
   style = {},
   // @ts-ignore
   attributes,
@@ -443,9 +478,8 @@ export const TableCellElement = ({
   // @ts-ignore
   element,
 }) => {
-  // @ts-ignore
-
   const editor = useSlate() as ReactEditor;
+  const { settings } = useContext(TableContext);
 
   // Assumption: no nested table, so the path is always [tableIdxAtRoot, rowIdx, colIdx]
   const [, rowIdx, colIdx] = ReactEditor.findPath(editor, element) as [
@@ -464,6 +498,24 @@ export const TableCellElement = ({
     [rowIdx + rowSpan - 1, colIdx + colSpan - 1],
   ]);
 
+  const minHeight = settings.rowSizes[rowIdx];
+
+  const domNode = useMemo(() => {
+    try {
+      return ReactEditor.toDOMNode(editor, element) as HTMLTableCellElement;
+    } catch (error) {
+      // spanned cell has no dom node
+      return null;
+    }
+  }, [editor, element]);
+
+  useEffect(() => {
+    if (domNode !== null) {
+      // console.log(domNode);
+      console.log(domNode.getBoundingClientRect());
+    }
+  }, [domNode]);
+
   if (element.colSpan === 0 || element.rowSpan === 0) {
     return null;
   }
@@ -474,6 +526,10 @@ export const TableCellElement = ({
         ...style,
         border: "1px solid",
         padding: "4px 8px",
+        verticalAlign: "top",
+        position: "relative",
+        // height for cell works as min-height in div
+        height: `${minHeight}px`,
       }}
       className={isCellSelected ? "cell-selected" : ""}
       rowSpan={rowSpan}
@@ -481,13 +537,39 @@ export const TableCellElement = ({
       {...attributes}
     >
       {children}
+      <ResizeHandle direction="horizontal" />
+      <ResizeHandle direction="vertical" />
     </td>
+  );
+};
+
+type ResizeHandleProps = {
+  direction: "horizontal" | "vertical";
+};
+
+const ResizeHandle = ({ direction }: ResizeHandleProps) => {
+  return (
+    <div
+      className={`table-resize-handle ${
+        direction === "horizontal"
+          ? "column-resize-handle"
+          : "row-resize-handle"
+      }`}
+      onMouseDown={(event) => {
+        event.preventDefault();
+        console.log("mouse down", {
+          x: event.clientX,
+          y: event.clientY,
+        });
+      }}
+    />
   );
 };
 
 // @ts-ignore
 export const TableButton = ({ icon }) => {
   const editor = useSlate();
+
   return (
     <Button
       active={isBlockActive(editor, "table")}

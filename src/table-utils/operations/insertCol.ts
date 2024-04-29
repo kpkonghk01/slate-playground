@@ -1,7 +1,7 @@
 import { Editor, Transforms } from "slate";
 import { initCell } from "../initTableElements";
 import { getTableInfo } from "../getTableInfo";
-import { CellElement } from "../../table-types";
+import { CellElement, TableElement } from "../../table-types";
 import { findSpanRootLocation } from "../findSpanRootLocation";
 import { getSpannedRowIndexesOfCol } from "../getSpannedRowIndexesOfCol";
 
@@ -80,4 +80,19 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
       at: [tableIdx, rowIdx, insertAt],
     });
   }
+
+  Transforms.setNodes<TableElement>(
+    editor,
+    {
+      settings: {
+        colSizes: [
+          ...tableNode.settings.colSizes.slice(0, insertAt),
+          0,
+          ...tableNode.settings.colSizes.slice(insertAt),
+        ],
+        rowSizes: tableNode.settings.rowSizes,
+      },
+    },
+    { at: [tableIdx] }
+  );
 };

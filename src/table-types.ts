@@ -16,5 +16,14 @@ export type RowElement = {
 
 export type TableElement = {
   type: "table";
+  settings: {
+    colSizes: number[];
+    rowSizes: number[];
+  };
   children: RowElement[];
+};
+
+export type Position = {
+  x: number;
+  y: number;
 };
