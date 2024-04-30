@@ -26,7 +26,7 @@ import "./table.css";
 import { CellsRange, ResizeDirection, TableElement } from "./table-types";
 import { findSpanRootLocation } from "./table-utils/findSpanRootLocation";
 import { findSpanCornerLocation } from "./table-utils/findSpanCornerLocation";
-import { MinCellWidth } from "./table-constants";
+import { MinCellHeight, MinCellWidth } from "./table-constants";
 
 // only use this hook in table element, since `isSelected` is false when the selection does not include the current cell
 const useTableSelection = (element: any) => {
@@ -350,32 +350,28 @@ const useResizeHandle = (editor: ReactEditor, element: TableElement) => {
   const updateResize = (position: number) => {
     let end = position;
     let invariant: number | null = null;
+    const minSize = direction === "horizontal" ? MinCellWidth : MinCellHeight;
+    const sizes =
+      direction === "horizontal"
+        ? element.settings.colSizes
+        : element.settings.rowSizes;
 
-    if (
-      direction === "horizontal" &&
-      element.settings.colSizes[targetIdx + 1] !== undefined
-    ) {
-      invariant =
-        element.settings.colSizes[targetIdx]! +
-        element.settings.colSizes[targetIdx + 1]!;
+    if (direction === "horizontal" && sizes[targetIdx + 1] !== undefined) {
+      invariant = sizes[targetIdx]! + sizes[targetIdx + 1]!;
     }
 
     const diff = end - start;
-    let newSize = element.settings.colSizes[targetIdx]! + diff;
+    let newSize = sizes[targetIdx]! + diff;
 
-    if (newSize < MinCellWidth) {
-      end = MinCellWidth - element.settings.colSizes[targetIdx]! + start;
+    if (newSize < minSize) {
+      end = minSize - sizes[targetIdx]! + start;
     }
 
     if (invariant !== null) {
-      let newNextSize = element.settings.colSizes[targetIdx + 1]! - diff;
+      let newNextSize = sizes[targetIdx + 1]! - diff;
 
-      if (newNextSize < MinCellWidth) {
-        end =
-          invariant -
-          MinCellWidth -
-          element.settings.colSizes[targetIdx]! +
-          start;
+      if (newNextSize < minSize) {
+        end = invariant - minSize - sizes[targetIdx]! + start;
       }
     }
 
