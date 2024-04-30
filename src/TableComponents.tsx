@@ -3,7 +3,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
+  useState,
 } from "react";
 import { ReactEditor, useSelected, useSlate } from "slate-react";
 import { isBlockActive } from "./common-utils";
@@ -22,7 +22,12 @@ import {
 import { Path, Range } from "slate";
 
 import "./table.css";
-import { CellsRange, TableElement } from "./table-types";
+import {
+  CellsRange,
+  Position,
+  ResizeDirection,
+  TableElement,
+} from "./table-types";
 import { findSpanRootLocation } from "./table-utils/findSpanRootLocation";
 import { findSpanCornerLocation } from "./table-utils/findSpanCornerLocation";
 
@@ -271,6 +276,21 @@ const TableContext = createContext({
     colSizes: [],
     rowSizes: [],
   } as TableElement["settings"],
+  resizeInfo: {
+    resizing: false,
+    direction: "",
+    idx: -1,
+    start: 0,
+    end: 0,
+    startResize: (
+      idx: number,
+      span: number,
+      direction: "" | ResizeDirection,
+      position: number
+    ) => {},
+    updateResize: (position: number) => {},
+    endResize: () => {},
+  },
 });
 
 const useCellSelection = (range: CellsRange) => {
@@ -305,6 +325,81 @@ const useCellSelection = (range: CellsRange) => {
   return false;
 };
 
+const useResizeHandle = (editor: ReactEditor, element: TableElement) => {
+  const [resizing, setResizing] = useState(false);
+  const [direction, setDirection] = useState<"" | ResizeDirection>("");
+  const [idx, setIdx] = useState(-1);
+  const [span, setSpan] = useState(1);
+  const [start, setStart] = useState(0);
+  const [end, setEnd] = useState(0);
+
+  const [tableIdx] = ReactEditor.findPath(editor, element) as [number];
+  const targetIdx = idx + span - 1;
+
+  const startResize = (
+    idx: number,
+    span: number,
+    direction: "" | ResizeDirection,
+    position: number
+  ) => {
+    setResizing(true);
+    setDirection(direction);
+    setIdx(idx);
+    setSpan(span);
+    setStart(position);
+    setEnd(position);
+
+    console.log({
+      resizing: true,
+      direction,
+      idx,
+      start: position,
+      end: position,
+    });
+  };
+
+  const updateResize = (position: number) => {
+    setEnd(position);
+
+    console.log({
+      resizing,
+      direction,
+      idx: targetIdx,
+      start,
+      end: position,
+    });
+  };
+
+  const endResize = () => {
+    // TODO: update settings
+    console.log({
+      resizing,
+      direction,
+      idx: targetIdx,
+      start,
+      end,
+    });
+
+    setResizing(false);
+    setDirection("");
+    setIdx(-1);
+    setSpan(1);
+    setStart(0);
+    setEnd(0);
+  };
+
+  return {
+    resizing,
+    direction,
+    idx: targetIdx,
+    start,
+    end,
+    startResize,
+    updateResize,
+    endResize,
+  };
+};
+
 export const Table = ({
   style = {},
   // @ts-ignore
@@ -317,12 +412,17 @@ export const Table = ({
   const editor = useSlate() as ReactEditor;
   const selectedRange = useTableSelection(element);
   const isSelected = useSelected();
+  const resizeInfo = useResizeHandle(editor, element);
 
   const focusedPath = editor.selection?.focus.path;
 
   return (
     <TableContext.Provider
-      value={{ selectedRange, settings: element.settings }}
+      value={{
+        selectedRange,
+        settings: element.settings,
+        resizeInfo,
+      }}
     >
       <table
         style={{
@@ -332,11 +432,19 @@ export const Table = ({
           tableLayout: "fixed",
         }}
         className={selectedRange ? "table-in-selection" : ""}
-        onMouseUp={(event) => {
-          console.log("mouse up", element, {
-            x: event.clientX,
-            y: event.clientY,
-          });
+        onMouseUp={() => {
+          if (resizeInfo.resizing) {
+            resizeInfo.endResize();
+          }
+        }}
+        onMouseMove={(event) => {
+          if (resizeInfo.resizing) {
+            resizeInfo.updateResize(
+              resizeInfo.direction === "horizontal"
+                ? event.clientX
+                : event.clientY
+            );
+          }
         }}
         {...attributes}
       >
@@ -345,7 +453,7 @@ export const Table = ({
             <col
               key={idx}
               style={{
-                minWidth: `${colSize}px`,
+                minWidth: `${colSize ?? 0}px`,
               }}
             />
           ))}
@@ -511,8 +619,7 @@ export const TableCell = ({
 
   useEffect(() => {
     if (domNode !== null) {
-      // console.log(domNode);
-      console.log(domNode.getBoundingClientRect());
+      // console.log(domNode.getBoundingClientRect());
     }
   }, [domNode]);
 
@@ -529,7 +636,7 @@ export const TableCell = ({
         verticalAlign: "top",
         position: "relative",
         // height for cell works as min-height in div
-        height: `${minHeight}px`,
+        height: `${minHeight ?? 0}px`,
       }}
       className={isCellSelected ? "cell-selected" : ""}
       rowSpan={rowSpan}
@@ -537,17 +644,35 @@ export const TableCell = ({
       {...attributes}
     >
       {children}
-      <ResizeHandle direction="horizontal" />
-      <ResizeHandle direction="vertical" />
+      <ResizeHandle
+        direction="horizontal"
+        idx={colIdx}
+        span={element.colSpan}
+      />
+      <ResizeHandle direction="vertical" idx={rowIdx} span={element.rowSpan} />
     </td>
   );
 };
 
 type ResizeHandleProps = {
-  direction: "horizontal" | "vertical";
+  idx: number;
+  direction: ResizeDirection;
+  span: number;
 };
 
-const ResizeHandle = ({ direction }: ResizeHandleProps) => {
+const ResizeHandle = ({ idx, direction, span }: ResizeHandleProps) => {
+  const {
+    resizeInfo: {
+      resizing,
+      idx: targetIdx,
+      direction: resizeDirection,
+      startResize,
+    },
+  } = useContext(TableContext);
+
+  const active =
+    resizing && resizeDirection === direction && idx + span - 1 === targetIdx;
+
   return (
     <div
       className={`table-resize-handle ${
@@ -555,12 +680,18 @@ const ResizeHandle = ({ direction }: ResizeHandleProps) => {
           ? "column-resize-handle"
           : "row-resize-handle"
       }`}
+      style={{
+        ...(active ? { backgroundColor: "blue", opacity: 1 } : {}),
+      }}
       onMouseDown={(event) => {
         event.preventDefault();
-        console.log("mouse down", {
-          x: event.clientX,
-          y: event.clientY,
-        });
+
+        startResize(
+          idx,
+          span,
+          direction,
+          direction === "horizontal" ? event.clientX : event.clientY
+        );
       }}
     />
   );

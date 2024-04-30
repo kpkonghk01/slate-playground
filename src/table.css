@@ -15,10 +15,6 @@
   background-color: black;
 }
 
-.table-resize-handle:hover {
-  opacity: 1;
-}
-
 .column-resize-handle {
   cursor: col-resize;
   width: 2px;
