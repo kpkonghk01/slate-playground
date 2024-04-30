@@ -3,6 +3,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { ReactEditor, useSelected, useSlate } from "slate-react";
@@ -19,17 +20,13 @@ import {
   mergeCells,
   splitCell,
 } from "./table-utils";
-import { Path, Range } from "slate";
+import { Path, Range, Transforms } from "slate";
 
 import "./table.css";
-import {
-  CellsRange,
-  Position,
-  ResizeDirection,
-  TableElement,
-} from "./table-types";
+import { CellsRange, ResizeDirection, TableElement } from "./table-types";
 import { findSpanRootLocation } from "./table-utils/findSpanRootLocation";
 import { findSpanCornerLocation } from "./table-utils/findSpanCornerLocation";
+import { MinCellWidth } from "./table-constants";
 
 // only use this hook in table element, since `isSelected` is false when the selection does not include the current cell
 const useTableSelection = (element: any) => {
@@ -348,38 +345,77 @@ const useResizeHandle = (editor: ReactEditor, element: TableElement) => {
     setSpan(span);
     setStart(position);
     setEnd(position);
-
-    console.log({
-      resizing: true,
-      direction,
-      idx,
-      start: position,
-      end: position,
-    });
   };
 
   const updateResize = (position: number) => {
-    setEnd(position);
+    let end = position;
+    let invariant: number | null = null;
 
-    console.log({
-      resizing,
-      direction,
-      idx: targetIdx,
-      start,
-      end: position,
-    });
+    if (
+      direction === "horizontal" &&
+      element.settings.colSizes[idx + 1] !== undefined
+    ) {
+      invariant =
+        element.settings.colSizes[idx]! + element.settings.colSizes[idx + 1]!;
+    }
+
+    invariantCondition: if (invariant !== null) {
+      const diff = end - start;
+      let newSize = element.settings.colSizes[idx]! + diff;
+      let newNextSize = element.settings.colSizes[idx + 1]! - diff;
+
+      if (newSize < MinCellWidth) {
+        end = MinCellWidth - element.settings.colSizes[idx]! + start;
+
+        break invariantCondition;
+      }
+
+      if (newNextSize < MinCellWidth) {
+        end =
+          invariant - MinCellWidth - element.settings.colSizes[idx]! + start;
+
+        break invariantCondition;
+      }
+    }
+
+    setEnd(end);
   };
 
   const endResize = () => {
-    // TODO: update settings
-    console.log({
-      resizing,
-      direction,
-      idx: targetIdx,
-      start,
-      end,
-    });
+    Transforms.setNodes<TableElement>(
+      editor,
+      {
+        settings:
+          direction === "horizontal"
+            ? {
+                ...element.settings,
+                colSizes: element.settings.colSizes.map((size, i) => {
+                  if (i === idx + span - 1) {
+                    return size + end - start;
+                  }
 
+                  if (i === idx + span) {
+                    return size - end + start;
+                  }
+
+                  return size;
+                }),
+              }
+            : {
+                ...element.settings,
+                rowSizes: element.settings.rowSizes.map((size, i) => {
+                  if (i === idx + span - 1) {
+                    return size + end - start;
+                  }
+
+                  return size;
+                }),
+              },
+      },
+      { at: [tableIdx] }
+    );
+
+    // reset initial state
     setResizing(false);
     setDirection("");
     setIdx(-1);
@@ -424,14 +460,11 @@ export const Table = ({
         resizeInfo,
       }}
     >
-      <table
+      {/* wrapper of table */}
+      <div
         style={{
-          ...style,
           width: "100%",
-          borderCollapse: "collapse",
-          tableLayout: "fixed",
         }}
-        className={selectedRange ? "table-in-selection" : ""}
         onMouseUp={() => {
           if (resizeInfo.resizing) {
             resizeInfo.endResize();
@@ -446,20 +479,46 @@ export const Table = ({
             );
           }
         }}
-        {...attributes}
       >
-        <colgroup>
-          {(element as TableElement).settings.colSizes.map((colSize, idx) => (
-            <col
-              key={idx}
-              style={{
-                minWidth: `${colSize ?? 0}px`,
-              }}
-            />
-          ))}
-        </colgroup>
-        <tbody>{children}</tbody>
-      </table>
+        <table
+          style={{
+            ...style,
+            borderCollapse: "collapse",
+            tableLayout: "fixed",
+          }}
+          className={selectedRange ? "table-in-selection" : ""}
+          {...attributes}
+        >
+          <colgroup>
+            {(element as TableElement).settings.colSizes.map((colSize, idx) => {
+              let minWidth = colSize;
+
+              if (
+                resizeInfo.resizing &&
+                resizeInfo.direction === "horizontal"
+              ) {
+                const diff = resizeInfo.end - resizeInfo.start;
+
+                if (idx === resizeInfo.idx) {
+                  minWidth = minWidth + diff;
+                } else if (idx === resizeInfo.idx + 1) {
+                  minWidth = minWidth - diff;
+                }
+              }
+
+              return (
+                <col
+                  key={idx}
+                  style={{
+                    minWidth: `${minWidth}px`,
+                  }}
+                />
+              );
+            })}
+          </colgroup>
+          <tbody>{children}</tbody>
+        </table>
+      </div>
       <div contentEditable={false}>
         <button
           onClick={() => {
@@ -587,7 +646,10 @@ export const TableCell = ({
   element,
 }) => {
   const editor = useSlate() as ReactEditor;
-  const { settings } = useContext(TableContext);
+  const {
+    settings,
+    resizeInfo: { resizing, direction, idx: resizeIdx, start, end },
+  } = useContext(TableContext);
 
   // Assumption: no nested table, so the path is always [tableIdxAtRoot, rowIdx, colIdx]
   const [, rowIdx, colIdx] = ReactEditor.findPath(editor, element) as [
@@ -606,7 +668,11 @@ export const TableCell = ({
     [rowIdx + rowSpan - 1, colIdx + colSpan - 1],
   ]);
 
-  const minHeight = settings.rowSizes[rowIdx];
+  let minHeight = settings.rowSizes[rowIdx]!;
+
+  if (resizing && direction === "vertical" && resizeIdx === rowIdx) {
+    minHeight += end - start;
+  }
 
   const domNode = useMemo(() => {
     try {

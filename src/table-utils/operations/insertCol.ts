@@ -4,6 +4,7 @@ import { getTableInfo } from "../getTableInfo";
 import { CellElement, TableElement } from "../../table-types";
 import { findSpanRootLocation } from "../findSpanRootLocation";
 import { getSpannedRowIndexesOfCol } from "../getSpannedRowIndexesOfCol";
+import { DefaultCellWidth } from "../../table-constants";
 
 // target should in the form of [tableIdxAtRoot, colIdx]
 export const insertCol = (editor: Editor, target: [number, number]) => {
@@ -87,7 +88,7 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
       settings: {
         colSizes: [
           ...tableNode.settings.colSizes.slice(0, insertAt),
-          0,
+          DefaultCellWidth,
           ...tableNode.settings.colSizes.slice(insertAt),
         ],
         rowSizes: tableNode.settings.rowSizes,

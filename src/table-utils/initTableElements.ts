@@ -1,3 +1,4 @@
+import { DefaultCellWidth, DefaultCellHeight } from "../table-constants";
 import { CellElement, RowElement, TableElement } from "../table-types";
 
 type InitTableProps = {
@@ -12,8 +13,8 @@ export const initTable = ({
   const table = {
     type: "table" as const,
     settings: {
-      colSizes: Array.from({ length: cols }, () => 0),
-      rowSizes: Array.from({ length: rows }, () => 0),
+      colSizes: Array.from({ length: cols }, () => DefaultCellWidth),
+      rowSizes: Array.from({ length: rows }, () => DefaultCellHeight),
     },
     children: [] as RowElement[],
   };
@@ -22,8 +23,6 @@ export const initTable = ({
     // @ts-ignore
     table.children.push(initRow(cols));
   }
-
-  console.log("init", table);
 
   return table;
 };
