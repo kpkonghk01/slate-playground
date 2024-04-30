@@ -79,6 +79,13 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
       // move span root cells to the next col and decrement colSpan
       if (spanRoot && spanRoot.colSpan > 1) {
         // span root cell
+        // move the content of the span root cell to the next col when deleting it
+        Transforms.moveNodes(editor, {
+          at: [tableIdx, rowIdx, deleteAt],
+          to: [tableIdx, rowIdx, deleteAt + 1],
+        });
+
+        // set span root cells to the next row and decrement rowSpan
         Transforms.setNodes<CellElement>(
           editor,
           {
