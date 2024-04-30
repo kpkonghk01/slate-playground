@@ -353,28 +353,29 @@ const useResizeHandle = (editor: ReactEditor, element: TableElement) => {
 
     if (
       direction === "horizontal" &&
-      element.settings.colSizes[idx + 1] !== undefined
+      element.settings.colSizes[targetIdx + 1] !== undefined
     ) {
       invariant =
-        element.settings.colSizes[idx]! + element.settings.colSizes[idx + 1]!;
+        element.settings.colSizes[targetIdx]! +
+        element.settings.colSizes[targetIdx + 1]!;
     }
 
-    invariantCondition: if (invariant !== null) {
-      const diff = end - start;
-      let newSize = element.settings.colSizes[idx]! + diff;
-      let newNextSize = element.settings.colSizes[idx + 1]! - diff;
+    const diff = end - start;
+    let newSize = element.settings.colSizes[targetIdx]! + diff;
 
-      if (newSize < MinCellWidth) {
-        end = MinCellWidth - element.settings.colSizes[idx]! + start;
+    if (newSize < MinCellWidth) {
+      end = MinCellWidth - element.settings.colSizes[targetIdx]! + start;
+    }
 
-        break invariantCondition;
-      }
+    if (invariant !== null) {
+      let newNextSize = element.settings.colSizes[targetIdx + 1]! - diff;
 
       if (newNextSize < MinCellWidth) {
         end =
-          invariant - MinCellWidth - element.settings.colSizes[idx]! + start;
-
-        break invariantCondition;
+          invariant -
+          MinCellWidth -
+          element.settings.colSizes[targetIdx]! +
+          start;
       }
     }
 
