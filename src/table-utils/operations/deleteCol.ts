@@ -60,7 +60,7 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
         break breakCondition;
       }
 
-      if (colSpannedFrom + colSpanCell.colSpan - 1 >= deleteAt) {
+      if (colSpannedFrom + colSpanCell.colSpan > deleteAt) {
         // decrement the colSpanned cell
         Transforms.setNodes<CellElement>(
           editor,

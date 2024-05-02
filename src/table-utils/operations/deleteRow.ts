@@ -35,9 +35,9 @@ export const deleteRow = (editor: Editor, target: [number, number]) => {
 
   for (let colIdx = 0; colIdx < numberOfCols; colIdx++) {
     if (!rowSpannedAt.has(colIdx)) {
+      // not a spanned cell, but may be a span root cell
       const spanRoot = tableNode.children[deleteAt]?.children[colIdx];
 
-      // not a spanned cell, but may be a span root cell
       if (spanRoot && spanRoot.rowSpan > 1) {
         // span root cell
 
@@ -45,6 +45,12 @@ export const deleteRow = (editor: Editor, target: [number, number]) => {
         Transforms.moveNodes(editor, {
           at: [tableIdx, deleteAt, colIdx],
           to: [tableIdx, deleteAt + 1, colIdx],
+        });
+
+        // exchange the spanned cell below to the span root cell
+        Transforms.moveNodes(editor, {
+          at: [tableIdx, deleteAt + 1, colIdx + 1],
+          to: [tableIdx, deleteAt, colIdx],
         });
 
         // set span root cells to the next row and decrement rowSpan
@@ -82,12 +88,7 @@ export const deleteRow = (editor: Editor, target: [number, number]) => {
       continue;
     }
 
-    if (rowSpanCell.rowSpan === 0) {
-      // border cell
-      continue;
-    }
-
-    if (rowSpannedFrom + rowSpanCell.rowSpan - 1 >= deleteAt) {
+    if (rowSpannedFrom + rowSpanCell.rowSpan > deleteAt) {
       // decrement the rowSpanned cell
       Transforms.setNodes<CellElement>(
         editor,
