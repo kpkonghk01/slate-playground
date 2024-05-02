@@ -14,6 +14,10 @@ import {
 import { withHistory } from "slate-history";
 
 import { Button, Icon, Toolbar } from "./components";
+import { isBlockActive } from "./common-utils";
+import { TableButton, TableCell, Table, TableRow } from "./TableComponents";
+import { withTable } from "./table-utils";
+import { DefaultCellHeight, DefaultCellWidth } from "./table-constants";
 
 const HOTKEYS = {
   "mod+b": "bold",
@@ -25,13 +29,20 @@ const HOTKEYS = {
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
 
-const RichTextExample = () => {
+const RichTextExample = ({
+  handleUpdate,
+}: {
+  handleUpdate?: (arg: any) => void;
+}) => {
   const renderElement = useCallback((props: any) => <Element {...props} />, []);
   const renderLeaf = useCallback((props: any) => <Leaf {...props} />, []);
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+  const editor = useMemo(
+    () => withTable(withHistory(withReact(createEditor()))),
+    []
+  );
 
   return (
-    <Slate editor={editor} initialValue={initialValue}>
+    <Slate editor={editor} initialValue={initialValue} onChange={handleUpdate}>
       <link
         rel="stylesheet"
         href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -50,8 +61,10 @@ const RichTextExample = () => {
         <BlockButton format="center" icon="format_align_center" />
         <BlockButton format="right" icon="format_align_right" />
         <BlockButton format="justify" icon="format_align_justify" />
+        <TableButton icon="table_view" />
       </Toolbar>
       <Editable
+        style={{ padding: "8px 30px" }}
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         placeholder="Enter some rich text…"
@@ -87,6 +100,7 @@ const toggleBlock = (editor: Editor, format: string) => {
       !TEXT_ALIGN_TYPES.includes(format),
     split: true,
   });
+
   let newProperties: Partial<SlateElement>;
   if (TEXT_ALIGN_TYPES.includes(format)) {
     newProperties = {
@@ -99,6 +113,7 @@ const toggleBlock = (editor: Editor, format: string) => {
       type: isActive ? "paragraph" : isList ? "list-item" : format,
     };
   }
+
   Transforms.setNodes<SlateElement>(editor, newProperties);
 
   if (!isActive && isList) {
@@ -117,24 +132,6 @@ const toggleMark = (editor: BaseEditor, format: string) => {
   }
 };
 
-const isBlockActive = (editor: BaseEditor, format: any, blockType = "type") => {
-  const { selection } = editor;
-  if (!selection) return false;
-
-  const [match] = Array.from(
-    Editor.nodes(editor, {
-      at: Editor.unhangRange(editor, selection),
-      match: (n) =>
-        !Editor.isEditor(n) &&
-        SlateElement.isElement(n) &&
-        // @ts-ignore
-        n[blockType] === format,
-    })
-  );
-
-  return !!match;
-};
-
 const isMarkActive = (editor: BaseEditor, format: string | number) => {
   const marks = Editor.marks(editor);
   // @ts-ignore
@@ -144,6 +141,7 @@ const isMarkActive = (editor: BaseEditor, format: string | number) => {
 // @ts-ignore
 const Element = ({ attributes, children, element }) => {
   const style = { textAlign: element.align };
+
   switch (element.type) {
     case "block-quote":
       return (
@@ -180,6 +178,24 @@ const Element = ({ attributes, children, element }) => {
         <ol style={style} {...attributes}>
           {children}
         </ol>
+      );
+    case "table":
+      return (
+        <Table style={style} attributes={attributes} element={element}>
+          {children}
+        </Table>
+      );
+    case "table-row":
+      return (
+        <TableRow style={style} attributes={attributes} element={element}>
+          {children}
+        </TableRow>
+      );
+    case "table-cell":
+      return (
+        <TableCell style={style} attributes={attributes} element={element}>
+          {children}
+        </TableCell>
       );
     default:
       return (
@@ -247,45 +263,2917 @@ const MarkButton = ({ format, icon }) => {
   );
 };
 
-const initialValue: Descendant[] = [
-  {
-    type: "paragraph",
-    children: [
-      { text: "This is editable " },
-      // @ts-ignore
-      { text: "rich", bold: true },
-      { text: " text, " },
-      // @ts-ignore
-      { text: "much", italic: true },
-      { text: " better than a " },
-      // @ts-ignore
-      { text: "<textarea>", code: true },
-      { text: "!" },
-    ],
-  },
+// const initialValue: Descendant[] = [
+//   {
+//     // @ts-ignore
+//     type: "paragraph",
+//     children: [
+//       { text: "" },
+//       // { text: "This is editable " },
+//       // // @ts-ignore
+//       // { text: "rich", bold: true },
+//       // { text: " text, " },
+//       // // @ts-ignore
+//       // { text: "much", italic: true },
+//       // { text: " better than a " },
+//       // // @ts-ignore
+//       // { text: "<textarea>", code: true },
+//       // { text: "!" },
+//     ],
+//   },
+//   // {
+//   //   type: "paragraph",
+//   //   children: [
+//   //     {
+//   //       text: "Since it's rich text, you can do things like turn a selection of text ",
+//   //     },
+//   //     // @ts-ignore
+//   //     { text: "bold", bold: true },
+//   //     {
+//   //       text: ", or add a semantically rendered block quote in the middle of the page, like this:",
+//   //     },
+//   //   ],
+//   // },
+//   // {
+//   //   // @ts-ignore
+//   //   type: "block-quote",
+//   //   children: [{ text: "A wise quote." }],
+//   // },
+//   // {
+//   //   // @ts-ignore
+//   //   type: "paragraph",
+//   //   align: "center",
+//   //   children: [{ text: "Try it out for yourself!" }],
+//   // },
+// ];
+
+// const initialValue: Descendant[] = [
+//   {
+//     // @ts-ignore
+//     type: "paragraph",
+//     children: [{ text: "" }],
+//   },
+//   {
+//     type: "table",
+//     children: [
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 7,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 9,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 3,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 3,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 3,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "1",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "2",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "3",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 3,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 3,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "4",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 3,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 3,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "15",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "6",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "2",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "3",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 3,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 3,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "7",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "8",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 3,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 3,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "9",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "4",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 3,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 3,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "5",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "6",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 1,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 2,
+//             colSpan: 3,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//       {
+//         type: "table-row",
+//         children: [
+//           {
+//             type: "table-cell",
+//             rowSpan: 1,
+//             colSpan: 7,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "7",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "8",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//           {
+//             type: "table-cell",
+//             rowSpan: 0,
+//             colSpan: 0,
+//             children: [
+//               {
+//                 // @ts-ignore
+//                 type: "paragraph",
+//                 children: [
+//                   {
+//                     text: "9",
+//                   },
+//                 ],
+//               },
+//             ],
+//           },
+//         ],
+//       },
+//     ],
+//   },
+// ];
+
+const initialValue = [
   {
     type: "paragraph",
     children: [
       {
-        text: "Since it's rich text, you can do things like turn a selection of text ",
-      },
-      // @ts-ignore
-      { text: "bold", bold: true },
-      {
-        text: ", or add a semantically rendered block quote in the middle of the page, like this:",
+        text: "",
       },
     ],
   },
   {
-    // @ts-ignore
-    type: "block-quote",
-    children: [{ text: "A wise quote." }],
-  },
-  {
-    // @ts-ignore
-    type: "paragraph",
-    align: "center",
-    children: [{ text: "Try it out for yourself!" }],
+    type: "table",
+    settings: {
+      colSizes: [150, 150, 150, 150, 150, 150],
+      rowSizes: [59.5, 59.5, 59.5, 59.5, 59.5, 59.5, 59.5],
+    },
+    children: [
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "na",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "1",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "2",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "3",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "5",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "a",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "a1",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "a2",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "a3",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "a4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "a5",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "b",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "b1",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "b2",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "b3",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "b4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "b5",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "c",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "c1",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "c2",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "c3",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "c4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "c5",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "d",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "d1",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "d2",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "d3",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "d4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "d5",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "e",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "e1",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "e2",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "e3",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "e4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "e5",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "table-row",
+        children: [
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "f",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "f1",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "f2",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "f3",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "f4",
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            type: "table-cell",
+            rowSpan: 1,
+            colSpan: 1,
+            children: [
+              {
+                type: "paragraph",
+                children: [
+                  {
+                    text: "f5",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
   },
 ];
 
