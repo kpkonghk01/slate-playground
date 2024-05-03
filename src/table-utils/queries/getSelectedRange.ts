@@ -13,11 +13,8 @@ export const getSelectedRange = (editor: ReactEditor): CellsRange | null => {
     return null;
   }
 
-  // to prevent edge selection cross table's end
-  const range = Editor.unhangRange(editor, selection, { voids: true });
-
   // edges must be forward direction of selection
-  const [startPoint, endPoint] = Range.edges(range); // equals to `Editor.edges(editor, selection)`
+  const [startPoint, endPoint] = Range.edges(selection); // equals to `Editor.edges(editor, selection)`
   const tableRootPath = getSelectedTablePath(editor);
 
   // Assumption: no nested table
@@ -27,20 +24,8 @@ export const getSelectedRange = (editor: ReactEditor): CellsRange | null => {
     return null;
   }
 
-  const selectedRange: CellsRange = [
-    Path.relative(startPoint.path, tableRootPath).slice(
-      0,
-      2,
-    ) as CellsRange[number],
-    Path.relative(endPoint.path, tableRootPath).slice(
-      0,
-      2,
-    ) as CellsRange[number],
-  ];
-
-  // normalize selection range, ensure the selection is from the top-left corner to the bottom-right corner
-  let normalizedSelectedRange: CellsRange =
-    normalizeSelectedRange(selectedRange);
+  let startPath = startPoint.path;
+  let endPath = endPoint.path;
 
   const tableInfo = getTableInfo(editor, tableRootPath[0]!);
 
@@ -50,10 +35,37 @@ export const getSelectedRange = (editor: ReactEditor): CellsRange | null => {
     return null;
   }
 
+  {
+    // to prevent the selection edge is outside the table
+    if (startPath[0] !== tableRootPath[0]) {
+      // set start path to the first cell of the table
+      startPath = tableRootPath.concat([0, 0]);
+    }
+
+    if (endPath[0] !== tableRootPath[0]) {
+      // set end path to the last cell of the table
+      endPath = tableRootPath.concat([
+        tableInfo.numberOfRows - 1,
+        tableInfo.numberOfCols - 1,
+      ]);
+    }
+  }
+
+  const selectedRange: CellsRange = [
+    Path.relative(startPath, tableRootPath).slice(0, 2) as CellsRange[number],
+    Path.relative(endPath, tableRootPath).slice(0, 2) as CellsRange[number],
+  ];
+
+  // normalize selection range, ensure the selection is from the top-left corner to the bottom-right corner
+  let normalizedSelectedRange: CellsRange =
+    normalizeSelectedRange(selectedRange);
+
   normalizedSelectedRange = expandSelectedRange(
     normalizedSelectedRange,
     tableInfo,
   );
+
+  console.log("normalizedSelectedRange", normalizedSelectedRange);
 
   return normalizedSelectedRange;
 };
