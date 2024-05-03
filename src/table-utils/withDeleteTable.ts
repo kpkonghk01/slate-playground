@@ -113,6 +113,23 @@ export const withDeleteTableFragment = (editor: ReactEditor) => {
     const tableRootPath = getSelectedTablePath(editor);
 
     if (tableRootPath == null) {
+      // non table elements selected
+
+      const cellsGenerator = Editor.nodes(editor, {
+        at: selection,
+        match: (n) => {
+          // @ts-ignore
+          return n.type === "table-cell";
+        },
+      });
+
+      if (!cellsGenerator.next().done) {
+        // cross table selection
+
+        // collapse the selection to prevent insert text with cross selection
+        Transforms.collapse(editor);
+      }
+
       deleteFragment(options);
 
       return;

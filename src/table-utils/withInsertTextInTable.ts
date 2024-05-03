@@ -66,7 +66,6 @@ export const withInsertTextInTable = (editor: ReactEditor) => {
 
       // collapse the selection to prevent insert text with cross selection
       Transforms.collapse(editor);
-      return;
     }
 
     // no table in the selection
