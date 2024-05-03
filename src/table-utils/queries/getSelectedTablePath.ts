@@ -1,5 +1,5 @@
 import { Editor, Path } from "slate";
-import { TableElement } from "../table-types";
+import { TableElement } from "../../table-types";
 
 export function getSelectedTablePath(editor: Editor): Path | null {
   const selection = editor.selection;

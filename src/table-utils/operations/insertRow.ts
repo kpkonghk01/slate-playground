@@ -1,9 +1,9 @@
 import { Editor, Transforms } from "slate";
 import { CellElement, TableElement } from "../../table-types";
 import { initRow } from "../initTableElements";
-import { getTableInfo } from "../getTableInfo";
-import { findSpanRootLocation } from "../findSpanRootLocation";
-import { getSpannedColIndexesOfRow } from "../getSpannedColIndexesOfRow";
+import { getTableInfo } from "../queries/getTableInfo";
+import { findSpanRootLocation } from "../queries/findSpanRootLocation";
+import { getSpannedColIndexesOfRow } from "../queries/getSpannedColIndexesOfRow";
 
 // target should in the form of [tableIdxAtRoot, rowIdx]
 export const insertRow = (editor: Editor, target: [number, number]) => {
@@ -66,7 +66,7 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
         },
         {
           at: [tableIdx, rowSpannedFrom, colIdx],
-        }
+        },
       );
     }
   }
@@ -83,7 +83,7 @@ export const insertRow = (editor: Editor, target: [number, number]) => {
         ],
       },
     },
-    { at: [tableIdx] }
+    { at: [tableIdx] },
   );
   Transforms.insertNodes(editor, newRow, { at: target });
 };

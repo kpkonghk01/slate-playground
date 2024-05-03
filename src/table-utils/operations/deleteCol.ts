@@ -1,8 +1,8 @@
 import { Editor, Transforms } from "slate";
-import { getTableInfo } from "../getTableInfo";
-import { getSpannedRowIndexesOfCol } from "../getSpannedRowIndexesOfCol";
+import { getTableInfo } from "../queries/getTableInfo";
+import { getSpannedRowIndexesOfCol } from "../queries/getSpannedRowIndexesOfCol";
 import { CellElement, TableElement } from "../../table-types";
-import { findSpanRootLocation } from "../findSpanRootLocation";
+import { findSpanRootLocation } from "../queries/findSpanRootLocation";
 
 export const deleteCol = (editor: Editor, target: [number, number]) => {
   if (target.length !== 2) {
@@ -69,7 +69,7 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
           },
           {
             at: [tableIdx, rowIdx, colSpannedFrom],
-          }
+          },
         );
       }
     } else {
@@ -94,7 +94,7 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
           },
           {
             at: [tableIdx, rowIdx, deleteAt + 1],
-          }
+          },
         );
       }
     }
@@ -113,6 +113,6 @@ export const deleteCol = (editor: Editor, target: [number, number]) => {
         rowSizes: tableNode.settings.rowSizes,
       },
     },
-    { at: [tableIdx] }
+    { at: [tableIdx] },
   );
 };

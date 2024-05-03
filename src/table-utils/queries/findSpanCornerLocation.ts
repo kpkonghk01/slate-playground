@@ -1,10 +1,10 @@
-import { TableElement } from "../table-types";
+import { TableElement } from "../../table-types";
 import { findSpanRootLocation } from "./findSpanRootLocation";
 
 // corner must be the bottom-right cell of the spanned area
 export const findSpanCornerLocation = (
   tableNode: TableElement,
-  currentLocation: [number, number]
+  currentLocation: [number, number],
 ): [number, number] | null => {
   const spanRootAt = findSpanRootLocation(tableNode, currentLocation);
 

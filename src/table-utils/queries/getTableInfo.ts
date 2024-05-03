@@ -1,8 +1,17 @@
 import { Editor, NodeEntry } from "slate";
-import { TableElement } from "../table-types";
+import { TableElement } from "../../table-types";
+
+export type TableInfo = {
+  tableNode: TableElement;
+  numberOfRows: number;
+  numberOfCols: number;
+};
 
 // Assumption: no nested table
-export const getTableInfo = (editor: Editor, tableIdx: number) => {
+export const getTableInfo = (
+  editor: Editor,
+  tableIdx: number,
+): TableInfo | null => {
   const [tableNode] = Editor.node(editor, [
     tableIdx,
   ]) as NodeEntry<TableElement>;

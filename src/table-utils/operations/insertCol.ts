@@ -1,9 +1,9 @@
 import { Editor, Transforms } from "slate";
 import { initCell } from "../initTableElements";
-import { getTableInfo } from "../getTableInfo";
+import { getTableInfo } from "../queries/getTableInfo";
 import { CellElement, TableElement } from "../../table-types";
-import { findSpanRootLocation } from "../findSpanRootLocation";
-import { getSpannedRowIndexesOfCol } from "../getSpannedRowIndexesOfCol";
+import { findSpanRootLocation } from "../queries/findSpanRootLocation";
+import { getSpannedRowIndexesOfCol } from "../queries/getSpannedRowIndexesOfCol";
 import { DefaultCellWidth } from "../../table-constants";
 
 // target should in the form of [tableIdxAtRoot, colIdx]
@@ -72,7 +72,7 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
           },
           {
             at: [tableIdx, rowIdx, colSpannedFrom],
-          }
+          },
         );
       }
     }
@@ -94,6 +94,6 @@ export const insertCol = (editor: Editor, target: [number, number]) => {
         rowSizes: tableNode.settings.rowSizes,
       },
     },
-    { at: [tableIdx] }
+    { at: [tableIdx] },
   );
 };

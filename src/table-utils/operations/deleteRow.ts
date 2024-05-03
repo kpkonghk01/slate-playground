@@ -1,7 +1,7 @@
 import { Editor, Transforms } from "slate";
-import { getTableInfo } from "../getTableInfo";
-import { getSpannedColIndexesOfRow } from "../getSpannedColIndexesOfRow";
-import { findSpanRootLocation } from "../findSpanRootLocation";
+import { getTableInfo } from "../queries/getTableInfo";
+import { getSpannedColIndexesOfRow } from "../queries/getSpannedColIndexesOfRow";
+import { findSpanRootLocation } from "../queries/findSpanRootLocation";
 import { CellElement, TableElement } from "../../table-types";
 
 export const deleteRow = (editor: Editor, target: [number, number]) => {
@@ -62,7 +62,7 @@ export const deleteRow = (editor: Editor, target: [number, number]) => {
           },
           {
             at: [tableIdx, deleteAt + 1, colIdx],
-          }
+          },
         );
       }
 
@@ -97,7 +97,7 @@ export const deleteRow = (editor: Editor, target: [number, number]) => {
         },
         {
           at: [tableIdx, rowSpannedFrom, colIdx],
-        }
+        },
       );
     }
   }
@@ -113,7 +113,7 @@ export const deleteRow = (editor: Editor, target: [number, number]) => {
         ],
       },
     },
-    { at: [tableIdx] }
+    { at: [tableIdx] },
   );
   Transforms.removeNodes(editor, { at: target });
 };

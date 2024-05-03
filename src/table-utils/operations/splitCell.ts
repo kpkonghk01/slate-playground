@@ -1,5 +1,5 @@
 import { Editor, Transforms } from "slate";
-import { getTableInfo } from "../getTableInfo";
+import { getTableInfo } from "../queries/getTableInfo";
 import { CellElement } from "../../table-types";
 
 export const splitCell = (editor: Editor, target: [number, number, number]) => {
@@ -40,7 +40,7 @@ export const splitCell = (editor: Editor, target: [number, number, number]) => {
           rowSpan: 1,
           colSpan: 1,
         },
-        { at: [tableIdx, i, j] }
+        { at: [tableIdx, i, j] },
       );
     }
   }

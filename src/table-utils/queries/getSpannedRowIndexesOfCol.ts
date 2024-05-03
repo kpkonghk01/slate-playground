@@ -1,8 +1,8 @@
-import { TableElement } from "../table-types";
+import { TableElement } from "../../table-types";
 
 export const getSpannedRowIndexesOfCol = (
   tableNode: TableElement,
-  insertAt: number
+  insertAt: number,
 ) => {
   const colSpannedAt = new Set<number>();
   const numberOfRows = tableNode.children.length;

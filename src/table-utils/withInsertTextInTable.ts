@@ -1,6 +1,6 @@
 import { Editor, Path, Range, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
-import { getSelectedTablePath } from "./getSelectedTablePath";
+import { getSelectedTablePath } from "./queries/getSelectedTablePath";
 
 export const withInsertTextInTable = (editor: ReactEditor) => {
   const { insertText } = editor;
@@ -21,22 +21,21 @@ export const withInsertTextInTable = (editor: ReactEditor) => {
       return;
     }
 
-    const selectedTablePath = getSelectedTablePath(editor);
+    const tableRootPath = getSelectedTablePath(editor);
 
-    if (selectedTablePath !== null) {
-      // selection is inside a table
+    if (tableRootPath !== null) {
+      // non selection table detected
 
       // FIXME: the focus is not correct when the selection is backward, but Range.isBackward is always false, the selection looks always forward
       // plate.js has the same issue
-
       const anchorCellPath = selection.anchor.path.slice(0, 3);
       const focusCellPath = selection.focus.path.slice(0, 3);
-      const isOnlyOneCellSelected =
+      const onlyOneCellSelected =
         anchorCellPath.length === 3 &&
         focusCellPath.length === 3 &&
         Path.equals(anchorCellPath, focusCellPath);
 
-      if (isOnlyOneCellSelected) {
+      if (onlyOneCellSelected) {
         insertText(text);
       } else {
         // selection is inside a table and cross cells
@@ -64,10 +63,9 @@ export const withInsertTextInTable = (editor: ReactEditor) => {
     if (!cellsGenerator.next().done) {
       // cross table selection with non table elements
       // TODO: behavior TBD
-      console.info(
-        "unhandled case: cross table selection with non table elements"
-      );
 
+      // collapse the selection to prevent insert text with cross selection
+      Transforms.collapse(editor);
       return;
     }
 

@@ -1,5 +1,12 @@
-import { Editor, Element, Point, Range } from "slate";
+import { Editor, Element, Path, Point, Range, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
+import { getSelectedTablePath } from "./queries/getSelectedTablePath";
+import { CellElement, CellsRange } from "../table-types";
+import { normalizeSelectedRange } from "./normalizeSelectedRange";
+import { getTableInfo } from "./queries/getTableInfo";
+import { expandSelectedRange } from "./expandSelectedRange";
+import { initCell } from "./initTableElements";
+import { getSelectedRange } from "./queries/getSelectedRange";
 
 export const withDeleteTableBackward = (editor: ReactEditor) => {
   const { deleteBackward } = editor;
@@ -62,6 +69,104 @@ export const withDeleteTableForward = (editor: ReactEditor) => {
     }
 
     deleteForward(unit);
+  };
+
+  return editor;
+};
+
+// not used
+export const withDeleteTable = (editor: ReactEditor) => {
+  const { delete: deleteHook } = editor;
+
+  editor.delete = (options) => {
+    console.log("delete", options);
+    // multi selection delete, cut after deleteFragment
+    // also drag, but drag don't trigger deleteFragment
+
+    // drag with multiple cells is forbidden in table, handled by `onMouseDown` in `TableElement`
+    // drag with single cell is allowed
+    deleteHook(options);
+  };
+
+  return editor;
+};
+
+export const withDeleteTableFragment = (editor: ReactEditor) => {
+  const { deleteFragment } = editor;
+
+  editor.deleteFragment = (options) => {
+    // multi selection delete, cut
+
+    const { selection } = editor;
+
+    if (!selection) {
+      // should not insert anything when there is no selection
+      return;
+    }
+
+    if (Range.isCollapsed(selection)) {
+      deleteFragment(options);
+
+      return;
+    }
+
+    const tableRootPath = getSelectedTablePath(editor);
+
+    if (tableRootPath == null) {
+      deleteFragment(options);
+
+      return;
+    }
+
+    // selection is inside a table
+    const selectedRange = getSelectedRange(editor);
+
+    if (!selectedRange) {
+      deleteFragment(options);
+
+      return;
+    }
+
+    const onlyOneCellSelected =
+      selectedRange[0][0] === selectedRange[1][0] &&
+      selectedRange[0][1] === selectedRange[1][1];
+
+    if (onlyOneCellSelected) {
+      deleteFragment(options);
+
+      return;
+    }
+
+    // customized delete for table with multi-cells selected
+    // delete the selected range
+    const [[startRow, startCol], [endRow, endCol]] = selectedRange;
+
+    for (let row = startRow; row <= endRow; row++) {
+      for (let col = startCol; col <= endCol; col++) {
+        // delete the cell
+        const cellPath = tableRootPath.concat([row, col]);
+
+        Transforms.removeNodes(editor, {
+          at: cellPath,
+        });
+
+        Transforms.insertNodes<CellElement>(editor, initCell(), {
+          at: cellPath,
+        });
+      }
+    }
+
+    // last "0, 0" is for focusing to the first text node of the first element in the cell
+    Transforms.select(editor, {
+      anchor: {
+        path: tableRootPath.concat([startRow, startCol, 0, 0]),
+        offset: 0,
+      },
+      focus: {
+        path: tableRootPath.concat([endRow, endCol, 0, 0]),
+        offset: 0,
+      },
+    });
   };
 
   return editor;

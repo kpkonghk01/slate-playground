@@ -1,12 +1,12 @@
 import { Editor, Node, NodeEntry, Transforms } from "slate";
 import { CellElement, CellsRange } from "../../table-types";
-import { getTableInfo } from "../getTableInfo";
+import { getTableInfo } from "../queries/getTableInfo";
 import { initCell } from "../initTableElements";
 
 export const mergeCells = (
   editor: Editor,
   tableIdx: number,
-  selectedRange: CellsRange | null
+  selectedRange: CellsRange | null,
 ) => {
   if (!Number.isInteger(tableIdx) || !selectedRange) {
     // no selection
@@ -42,7 +42,7 @@ export const mergeCells = (
             },
             {
               at: [tableIdx, rowIdx, colIdx],
-            }
+            },
           );
 
           // skip the first cell
@@ -63,7 +63,7 @@ export const mergeCells = (
           } as NodeEntry<CellElement>[0],
           {
             at: [tableIdx, rowIdx, colIdx],
-          }
+          },
         );
       }
     }
@@ -71,12 +71,12 @@ export const mergeCells = (
     // select the root of the merged cells, last "0, 0" is for focusing to the first text node of the first element in the cell
     // FIXME: not work as expected
     console.info(
-      "expect the selection to be focused on the first cell after merge, but it becomes a range selection"
+      "expect the selection to be focused on the first cell after merge, but it becomes a range selection",
     );
 
     Transforms.select(
       editor,
-      Editor.start(editor, [tableIdx, startRow, startCol, 0, 0])
+      Editor.start(editor, [tableIdx, startRow, startCol, 0, 0]),
     );
   });
 };

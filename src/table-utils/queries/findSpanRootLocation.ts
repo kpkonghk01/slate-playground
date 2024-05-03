@@ -1,9 +1,9 @@
-import { TableElement } from "../table-types";
+import { TableElement } from "../../table-types";
 
 // span root must be the top-left cell of the spanned area
 export const findSpanRootLocation = (
   tableNode: TableElement,
-  currentLocation: [number, number]
+  currentLocation: [number, number],
 ): [number, number] | null => {
   if (currentLocation.length !== 2) {
     // malformed target
