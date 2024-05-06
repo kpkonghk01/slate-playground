@@ -113,7 +113,6 @@ export const withSetTableFragmentData = (editor: ReactEditor) => {
           setFragmentData(data);
 
           // get plain text
-          console.log(data.getData("text/plain"));
           cellStrings.push(data.getData("text/plain"));
 
           const cellElement = document.createElement("td");
@@ -122,7 +121,10 @@ export const withSetTableFragmentData = (editor: ReactEditor) => {
           cellElement.rowSpan = cell.rowSpan;
 
           cellElement.innerHTML = data.getData("text/html");
-          rowElement.append(cellElement);
+
+          if (cellElement.rowSpan && cellElement.colSpan) {
+            rowElement.append(cellElement);
+          }
         }
 
         tableElement.append(rowElement);
@@ -132,10 +134,11 @@ export const withSetTableFragmentData = (editor: ReactEditor) => {
       }
     });
 
+    divElement.append(tableElement);
+    data.setData("text/html", divElement.innerHTML);
     data.setData("text/csv", textCsv);
     data.setData("text/tsv", textTsv);
     data.setData("text/plain", textTsv);
-    data.setData("text/html", divElement.innerHTML);
 
     const selectedFragmentStr = JSON.stringify(tableNode);
     const encodedFragment = window.btoa(
@@ -144,8 +147,6 @@ export const withSetTableFragmentData = (editor: ReactEditor) => {
     data.setData("application/x-slate-fragment", encodedFragment);
 
     Transforms.select(editor, initialSelection!);
-
-    divElement.append(tableElement);
   };
 
   return editor;
