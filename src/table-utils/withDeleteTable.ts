@@ -181,16 +181,7 @@ export const withDeleteTableFragment = (editor: ReactEditor) => {
     }
 
     // last "0, 0" is for focusing to the first text node of the first element in the cell
-    Transforms.select(editor, {
-      anchor: {
-        path: tableRootPath.concat([startRow, startCol, 0, 0]),
-        offset: 0,
-      },
-      focus: {
-        path: tableRootPath.concat([endRow, endCol, 0, 0]),
-        offset: 0,
-      },
-    });
+    Transforms.select(editor, tableRootPath.concat([startRow, startCol, 0, 0]));
   };
 
   return editor;

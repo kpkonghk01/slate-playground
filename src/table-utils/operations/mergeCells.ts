@@ -74,9 +74,7 @@ export const mergeCells = (
       "expect the selection to be focused on the first cell after merge, but it becomes a range selection",
     );
 
-    Transforms.select(
-      editor,
-      Editor.start(editor, [tableIdx, startRow, startCol, 0, 0]),
-    );
+    // Transforms.collapse(editor);
+    Transforms.select(editor, [tableIdx, startRow, startCol, 0, 0]);
   });
 };
