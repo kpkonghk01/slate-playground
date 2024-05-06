@@ -65,7 +65,5 @@ export const getSelectedRange = (editor: ReactEditor): CellsRange | null => {
     tableInfo,
   );
 
-  console.log("normalizedSelectedRange", normalizedSelectedRange);
-
   return normalizedSelectedRange;
 };

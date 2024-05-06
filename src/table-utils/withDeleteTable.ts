@@ -1,10 +1,8 @@
-import { Editor, Element, Path, Point, Range, Transforms } from "slate";
+import { Editor, Element, Point, Range, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
 import { getSelectedTablePath } from "./queries/getSelectedTablePath";
-import { CellElement, CellsRange } from "../table-types";
-import { normalizeSelectedRange } from "./normalizeSelectedRange";
+import { CellElement } from "../table-types";
 import { getTableInfo } from "./queries/getTableInfo";
-import { expandSelectedRange } from "./expandSelectedRange";
 import { initCell } from "./initTableElements";
 import { getSelectedRange } from "./queries/getSelectedRange";
 
@@ -144,9 +142,8 @@ export const withDeleteTableFragment = (editor: ReactEditor) => {
       return;
     }
 
-    const onlyOneCellSelected =
-      selectedRange[0][0] === selectedRange[1][0] &&
-      selectedRange[0][1] === selectedRange[1][1];
+    const [[startRow, startCol], [endRow, endCol]] = selectedRange;
+    const onlyOneCellSelected = startRow === endRow && startCol === endCol;
 
     if (onlyOneCellSelected) {
       deleteFragment(options);
@@ -155,21 +152,39 @@ export const withDeleteTableFragment = (editor: ReactEditor) => {
     }
 
     // customized delete for table with multi-cells selected
-    // delete the selected range
-    const [[startRow, startCol], [endRow, endCol]] = selectedRange;
+    // delete the selected range of cells
+    const tableInfo = getTableInfo(editor, tableRootPath[0]!);
+
+    if (!tableInfo) {
+      // should not happen
+      deleteFragment(options);
+
+      return;
+    }
+
+    const { tableNode } = tableInfo;
 
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
         // delete the cell
         const cellPath = tableRootPath.concat([row, col]);
+        const cell = tableNode.children[row]!.children[col]!;
 
         Transforms.removeNodes(editor, {
           at: cellPath,
         });
 
-        Transforms.insertNodes<CellElement>(editor, initCell(), {
-          at: cellPath,
-        });
+        Transforms.insertNodes<CellElement>(
+          editor,
+          {
+            ...initCell(),
+            rowSpan: cell.rowSpan ?? 1,
+            colSpan: cell.colSpan ?? 1,
+          } as CellElement,
+          {
+            at: cellPath,
+          },
+        );
       }
     }
 
