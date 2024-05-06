@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.splitCell = void 0;
 const slate_1 = require("slate");
-const getTableInfo_1 = require("../getTableInfo");
+const getTableInfo_1 = require("../queries/getTableInfo");
 const splitCell = (editor, target) => {
     const [tableIdx, rowIdx, colIdx] = target;
     const tableInfo = (0, getTableInfo_1.getTableInfo)(editor, tableIdx);

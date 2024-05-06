@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCol = void 0;
 const slate_1 = require("slate");
-const getTableInfo_1 = require("../getTableInfo");
-const getSpannedRowIndexesOfCol_1 = require("../getSpannedRowIndexesOfCol");
-const findSpanRootLocation_1 = require("../findSpanRootLocation");
+const getTableInfo_1 = require("../queries/getTableInfo");
+const getSpannedRowIndexesOfCol_1 = require("../queries/getSpannedRowIndexesOfCol");
+const findSpanRootLocation_1 = require("../queries/findSpanRootLocation");
 const deleteCol = (editor, target) => {
     if (target.length !== 2) {
         // malformed target

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.withInsertTextInTable = void 0;
 const slate_1 = require("slate");
-const getSelectedTablePath_1 = require("./getSelectedTablePath");
+const getSelectedTablePath_1 = require("./queries/getSelectedTablePath");
 const withInsertTextInTable = (editor) => {
     const { insertText } = editor;
     editor.insertText = (text) => {
@@ -17,17 +17,17 @@ const withInsertTextInTable = (editor) => {
             insertText(text);
             return;
         }
-        const selectedTablePath = (0, getSelectedTablePath_1.getSelectedTablePath)(editor);
-        if (selectedTablePath !== null) {
-            // selection is inside a table
+        const tableRootPath = (0, getSelectedTablePath_1.getSelectedTablePath)(editor);
+        if (tableRootPath !== null) {
+            // non selection table detected
             // FIXME: the focus is not correct when the selection is backward, but Range.isBackward is always false, the selection looks always forward
             // plate.js has the same issue
             const anchorCellPath = selection.anchor.path.slice(0, 3);
             const focusCellPath = selection.focus.path.slice(0, 3);
-            const isOnlyOneCellSelected = anchorCellPath.length === 3 &&
+            const onlyOneCellSelected = anchorCellPath.length === 3 &&
                 focusCellPath.length === 3 &&
                 slate_1.Path.equals(anchorCellPath, focusCellPath);
-            if (isOnlyOneCellSelected) {
+            if (onlyOneCellSelected) {
                 insertText(text);
             }
             else {
@@ -52,8 +52,8 @@ const withInsertTextInTable = (editor) => {
         if (!cellsGenerator.next().done) {
             // cross table selection with non table elements
             // TODO: behavior TBD
-            console.info("unhandled case: cross table selection with non table elements");
-            return;
+            // collapse the selection to prevent insert text with cross selection
+            slate_1.Transforms.collapse(editor);
         }
         // no table in the selection
         insertText(text);

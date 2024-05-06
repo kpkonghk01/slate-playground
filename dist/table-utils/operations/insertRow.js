@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertRow = void 0;
 const slate_1 = require("slate");
 const initTableElements_1 = require("../initTableElements");
-const getTableInfo_1 = require("../getTableInfo");
-const findSpanRootLocation_1 = require("../findSpanRootLocation");
-const getSpannedColIndexesOfRow_1 = require("../getSpannedColIndexesOfRow");
+const getTableInfo_1 = require("../queries/getTableInfo");
+const findSpanRootLocation_1 = require("../queries/findSpanRootLocation");
+const getSpannedColIndexesOfRow_1 = require("../queries/getSpannedColIndexesOfRow");
 // target should in the form of [tableIdxAtRoot, rowIdx]
 const insertRow = (editor, target) => {
     if (target.length !== 2) {

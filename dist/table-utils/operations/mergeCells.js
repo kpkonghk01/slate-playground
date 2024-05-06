@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mergeCells = void 0;
 const slate_1 = require("slate");
-const getTableInfo_1 = require("../getTableInfo");
+const getTableInfo_1 = require("../queries/getTableInfo");
 const initTableElements_1 = require("../initTableElements");
 const mergeCells = (editor, tableIdx, selectedRange) => {
-    if (!Number.isInteger(tableIdx) || !selectedRange) {
+    if (!Number.isInteger(tableIdx) || !editor.selection || !selectedRange) {
         // no selection
         return;
     }
@@ -50,7 +50,8 @@ const mergeCells = (editor, tableIdx, selectedRange) => {
         // select the root of the merged cells, last "0, 0" is for focusing to the first text node of the first element in the cell
         // FIXME: not work as expected
         console.info("expect the selection to be focused on the first cell after merge, but it becomes a range selection");
-        slate_1.Transforms.select(editor, slate_1.Editor.start(editor, [tableIdx, startRow, startCol, 0, 0]));
+        // Transforms.collapse(editor);
+        slate_1.Transforms.select(editor, [tableIdx, startRow, startCol, 0, 0]);
     });
 };
 exports.mergeCells = mergeCells;
