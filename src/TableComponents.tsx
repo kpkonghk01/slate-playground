@@ -37,10 +37,6 @@ const useTableSelection = (element: any) => {
   const selection = editor.selection;
   const isTable = element?.type === "table";
 
-  if (!isTable) {
-    return null;
-  }
-
   useEffect(() => {
     if (!isSelected || !selection) {
       setSelectedRange(null);
@@ -52,6 +48,10 @@ const useTableSelection = (element: any) => {
 
     setSelectedRange(newSelectedRange);
   }, [editor, isSelected, selection]);
+
+  if (!isTable) {
+    return null;
+  }
 
   return selectedRange;
 };
