@@ -142,15 +142,6 @@ export const withDeleteTableFragment = (editor: ReactEditor) => {
       return;
     }
 
-    const [[startRow, startCol], [endRow, endCol]] = selectedRange;
-    const onlyOneCellSelected = startRow === endRow && startCol === endCol;
-
-    if (onlyOneCellSelected) {
-      deleteFragment(options);
-
-      return;
-    }
-
     // customized delete for table with multi-cells selected
     // delete the selected range of cells
     const tableInfo = getTableInfo(editor, tableRootPath[0]!);
@@ -163,6 +154,7 @@ export const withDeleteTableFragment = (editor: ReactEditor) => {
     }
 
     const { tableNode } = tableInfo;
+    const [[startRow, startCol], [endRow, endCol]] = selectedRange;
 
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {

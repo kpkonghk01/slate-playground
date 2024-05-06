@@ -1,4 +1,4 @@
-import { Editor, Node, NodeEntry, Transforms } from "slate";
+import { Editor, NodeEntry, Transforms } from "slate";
 import { CellElement, CellsRange } from "../../table-types";
 import { getTableInfo } from "../queries/getTableInfo";
 import { initCell } from "../initTableElements";
@@ -8,7 +8,7 @@ export const mergeCells = (
   tableIdx: number,
   selectedRange: CellsRange | null,
 ) => {
-  if (!Number.isInteger(tableIdx) || !selectedRange) {
+  if (!Number.isInteger(tableIdx) || !editor.selection || !selectedRange) {
     // no selection
     return;
   }

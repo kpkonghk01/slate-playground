@@ -42,7 +42,6 @@ const useTableSelection = (element: any) => {
   }
 
   useEffect(() => {
-    // FIXME: if the cells are empty, the selection crosses two cells in a row will not be detected
     if (!isSelected || !selection) {
       setSelectedRange(null);
 
@@ -50,18 +49,6 @@ const useTableSelection = (element: any) => {
     }
 
     const newSelectedRange = getSelectedRange(editor);
-
-    if (newSelectedRange) {
-      const onlyOneCellSelected =
-        newSelectedRange[0][0] === newSelectedRange[1][0] &&
-        newSelectedRange[0][1] === newSelectedRange[1][1];
-
-      if (onlyOneCellSelected) {
-        setSelectedRange(null);
-
-        return;
-      }
-    }
 
     setSelectedRange(newSelectedRange);
   }, [editor, isSelected, selection]);

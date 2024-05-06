@@ -58,18 +58,10 @@ export const withSetTableFragmentData = (editor: ReactEditor) => {
       return;
     }
 
-    const [[startRow, startCol], [endRow, endCol]] = selectedRange;
-    const onlyOneCellSelected = startRow === endRow && startCol === endCol;
-
-    if (onlyOneCellSelected) {
-      setFragmentData(data, originEvent);
-
-      return;
-    }
-
     // cross cells selection
     const initialSelection = selection;
     const tableInfo = getTableInfo(editor, tableRootPath[0]!);
+    const [[startRow, startCol], [endRow, endCol]] = selectedRange;
 
     if (!tableInfo) {
       // should not happen

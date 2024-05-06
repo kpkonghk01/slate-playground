@@ -1,4 +1,4 @@
-import { Editor, Path, Range } from "slate";
+import { Path, Range } from "slate";
 import { ReactEditor } from "slate-react";
 import { CellsRange } from "../../table-types";
 import { getSelectedTablePath } from "./getSelectedTablePath";
@@ -59,6 +59,13 @@ export const getSelectedRange = (editor: ReactEditor): CellsRange | null => {
   // normalize selection range, ensure the selection is from the top-left corner to the bottom-right corner
   let normalizedSelectedRange: CellsRange =
     normalizeSelectedRange(selectedRange);
+
+  const [[startRow, startCol], [endRow, endCol]] = normalizedSelectedRange;
+
+  if (startRow === endRow && startCol === endCol) {
+    // only one cell selected
+    return null;
+  }
 
   normalizedSelectedRange = expandSelectedRange(
     normalizedSelectedRange,
