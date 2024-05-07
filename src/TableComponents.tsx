@@ -551,6 +551,7 @@ const ResizeHandle = ({ idx, direction, span }: ResizeHandleProps) => {
           direction === "horizontal" ? event.clientX : event.clientY,
         );
       }}
+      contentEditable={false}
     />
   );
 };
