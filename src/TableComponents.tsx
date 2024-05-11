@@ -15,6 +15,7 @@ import {
   insertRow,
   insertTable,
   mergeCells,
+  resizeCell,
   splitCell,
 } from "./table-utils";
 import { Transforms } from "slate";
@@ -168,38 +169,7 @@ const useResizeHandle = (editor: ReactEditor, element: TableElement) => {
   };
 
   const endResize = () => {
-    Transforms.setNodes<TableElement>(
-      editor,
-      {
-        settings:
-          direction === "horizontal"
-            ? {
-                ...element.settings,
-                colSizes: element.settings.colSizes.map((size, i) => {
-                  if (i === idx + span - 1) {
-                    return size + end - start;
-                  }
-
-                  if (i === idx + span) {
-                    return size - end + start;
-                  }
-
-                  return size;
-                }),
-              }
-            : {
-                ...element.settings,
-                rowSizes: element.settings.rowSizes.map((size, i) => {
-                  if (i === idx + span - 1) {
-                    return size + end - start;
-                  }
-
-                  return size;
-                }),
-              },
-      },
-      { at: [tableIdx] },
-    );
+    resizeCell(editor, element, tableIdx, direction, idx, span, end, start);
 
     // reset initial state
     setResizing(false);

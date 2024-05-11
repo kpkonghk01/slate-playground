@@ -86,9 +86,9 @@ export const withNormalizeTable = (editor: ReactEditor) => {
         });
         return;
       }
-
-      normalizeNode(entry);
     }
+
+    normalizeNode(entry);
   };
 
   return editor;
